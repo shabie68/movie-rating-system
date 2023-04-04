@@ -1,40 +1,87 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+    <div class="hello">
+        <h1>Movie Rating System</h1>
+  
+        <table>
+            <caption>All Movies</caption>
+            <tr>
+                <th>Title</th>
+                <th>Release Year</th>
+            </tr>
+              
+            <tr v-for="(movie, m) in movies" :key="m">
+                <td>{{movie.Title}}</td>
+                <td>{{movie.Year}}</td>
+            </tr>
+        </table>
+
+        
+        <div>
+            <p><input type="search" name="search" v-model="search"></p>   
+
+            <table>
+                <caption>All Movies</caption>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Release Year</th>
+                    </tr>    
+                </thead>
+                
+                  
+                <tr v-for="(fmovie, fm) in filterMovies" :key="fm">
+                    <td>{{fmovie.Title}}</td>
+                    <td>{{fmovie.Year}}</td>
+                </tr>
+            </table> 
+        </div>
+        
+    </div>
 </template>
 
 <script>
+
+import axios from 'axios'
 export default {
   name: 'HelloWorld',
   props: {
-    msg: String
+  },
+
+  data() {
+	return {
+		movies: null,
+		search: 0
+	}
+  },
+
+  mounted(){
+    this.loadMovies()
+  },
+
+  methods:{
+	loadMovies() {
+		var _this = this
+		axios.get('http://www.omdbapi.com/?i=tt3896198&apikey=8e76539a&s=active')
+		.then(function(response) {_this.movies = response.data.Search;console.log(_this.movies);})	
+
+    }
+  },
+
+  computed: {
+    filterMovies() {
+
+        if(this.movies) {
+            return this.movies.filter(movie => {
+                // return true if the movies should be visible
+                
+
+                return movie.Title.toLowerCase().indexOf(this.search.toLowerCase()) != -1;
+          });
+        }else {
+            return 'testing'
+        }
+      
+    }
   }
 }
 </script>
@@ -55,4 +102,47 @@ li {
 a {
   color: #42b983;
 }
+
+p {
+    text-align: start;
+}
+
+html {
+  font-family: sans-serif;
+}
+
+table {
+  border-collapse: collapse;
+  border: 2px solid rgb(200,200,200);
+  letter-spacing: 1px;
+  font-size: 0.8rem;
+}
+
+td, th {
+  border: 1px solid rgb(190,190,190);
+  padding: 10px 20px;
+}
+
+th {
+  background-color: rgb(235,235,235);
+}
+
+td {
+  text-align: center;
+}
+
+tr:nth-child(even) td {
+  background-color: rgb(250,250,250);
+}
+
+tr:nth-child(odd) td {
+  background-color: rgb(245,245,245);
+}
+
+caption {
+  padding: 10px;
+}
+
+
+
 </style>
