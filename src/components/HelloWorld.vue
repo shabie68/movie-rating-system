@@ -3,6 +3,7 @@
         <h1>Movie Rating System</h1>
   
         <table>
+            <p><input type="search" name="search" v-model="search" @change="loadMovies()" placeholder="search by title"></p>
             <caption>All Movies</caption>
             <tr>
                 <th>Title</th>
@@ -15,11 +16,10 @@
             </tr>
         </table>
 
-        
         <div>
-            <p><input type="search" name="search" v-model="search"></p>   
+               
 
-            <table>
+            <!-- <table>
                 <caption>All Movies</caption>
                 <thead>
                     <tr>
@@ -33,7 +33,7 @@
                     <td>{{fmovie.Title}}</td>
                     <td>{{fmovie.Year}}</td>
                 </tr>
-            </table> 
+            </table>  -->
         </div>
         
     </div>
@@ -50,38 +50,63 @@ export default {
   data() {
 	return {
 		movies: null,
-		search: 0
+    search: '',
+
 	}
   },
 
-  mounted(){
-    this.loadMovies()
-  },
-
   methods:{
-	loadMovies() {
-		var _this = this
-		axios.get('http://www.omdbapi.com/?i=tt3896198&apikey=8e76539a&s=active')
-		.then(function(response) {_this.movies = response.data.Search;console.log(_this.movies);})	
+
+  loadMovies() {
+
+    var _this = this
+    // let search_by_year = Number(this.search)
+    // let url = search_by_year ? `http://www.omdbapi.com/?i=tt3896198&apikey=8e76539a&s=${_this.search}&y=${search_by_year}` : `http://www.omdbapi.com/?i=tt3896198&apikey=8e76539a&s=${_this.search}`
+    let _search = _this.search.split(',')
+
+
+    
+    axios.get(`http://www.omdbapi.com/?apikey=8e76539a&s=${_search[0]}&y=${_search[1]}`)
+    .then(function(response) {
+      if(response.data.Response == "True") {
+        _this.displayMovieList(response.data.Search);
+      }
+    })  
+
+    },
+
+    displayMovieList(movies) {
+      this.movies = movies;
+      // thifilterMovies()
+    },
+
+    // movieDetail(id) {
+    //   axios.get(`http://www.omdbapi.com/?i=${id}&apikey=8e76539a`)
+    //   .then(function(response) {
+    //     console.log(response)
+    //   })
+    // }
+
+    filterMovies() {
 
     }
   },
 
   computed: {
-    filterMovies() {
+    // filterMovies() {
 
-        if(this.movies) {
-            return this.movies.filter(movie => {
-                // return true if the movies should be visible
+    //     if(this.movies) {
+    //         return this.movies.filter(movie => {
+    //             // return true if the movies should be visible
                 
 
-                return movie.Title.toLowerCase().indexOf(this.search.toLowerCase()) != -1;
-          });
-        }else {
-            return 'testing'
-        }
+    //             return movie.Title.toLowerCase().indexOf(this.search.toLowerCase()) != -1;
+    //       });
+    //     }else {
+    //         return 'testing'
+    //     }
       
-    }
+    // }
   }
 }
 </script>
