@@ -5,37 +5,39 @@
         <table>
             <p><input type="search" name="search" v-model="search" @change="loadMovies()" placeholder="search by title"></p>
             <caption>All Movies</caption>
-            <tr>
-                <th>Title</th>
-                <th>Release Year</th>
-            </tr>
+
+            <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Release Year</th>
+                  <th>Genre</th>
+                </tr>  
+            </thead>
+            
               
             <tr v-for="(movie, m) in movies" :key="m">
                 <td>{{movie.Title}}</td>
                 <td>{{movie.Year}}</td>
+                <td>{{movie.genre}}</td>
             </tr>
         </table>
-
-        <div>
                
-
-            <!-- <table>
-                <caption>All Movies</caption>
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Release Year</th>
-                    </tr>    
-                </thead>
-                
-                  
-                <tr v-for="(fmovie, fm) in filterMovies" :key="fm">
-                    <td>{{fmovie.Title}}</td>
-                    <td>{{fmovie.Year}}</td>
-                </tr>
-            </table>  -->
-        </div>
-        
+        <table>
+          <p><input type="search" name="filter_movie" v-model="filter_movie" @change="filterMovies()" placeholder="search by title"></p>
+            <caption>Filter Movies</caption>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Release Year</th>
+                </tr>    
+            </thead>
+            
+              
+            <tr v-for="(fmovie, fm) in all_filter_movies" :key="fm">
+                <td>{{fmovie.Title}}</td>
+                <td>{{fmovie.Year}}</td>
+            </tr>
+        </table> 
     </div>
 </template>
 
@@ -51,6 +53,8 @@ export default {
 	return {
 		movies: null,
     search: '',
+    filter_movie: '',
+    all_filter_movies: []
 
 	}
   },
@@ -64,8 +68,6 @@ export default {
     // let url = search_by_year ? `http://www.omdbapi.com/?i=tt3896198&apikey=8e76539a&s=${_this.search}&y=${search_by_year}` : `http://www.omdbapi.com/?i=tt3896198&apikey=8e76539a&s=${_this.search}`
     let _search = _this.search.split(',')
 
-
-    
     axios.get(`http://www.omdbapi.com/?apikey=8e76539a&s=${_search[0]}&y=${_search[1]}`)
     .then(function(response) {
       if(response.data.Response == "True") {
@@ -76,38 +78,33 @@ export default {
     },
 
     displayMovieList(movies) {
+      
       this.movies = movies;
-      // thifilterMovies()
+      this.movies.forEach((movie, index) => {
+        this.single_movie(movie, index)
+      })
     },
 
-    // movieDetail(id) {
-    //   axios.get(`http://www.omdbapi.com/?i=${id}&apikey=8e76539a`)
-    //   .then(function(response) {
-    //     console.log(response)
-    //   })
-    // }
+
+    single_movie(movie, index) {
+
+      let _this = this
+
+      axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=8e76539a`)
+      .then((response) => {
+
+        _this.movies[index]['genre'] = response.data.Genre
+      })
+    },
 
     filterMovies() {
-
+      this.movies.forEach((movie, index) => {
+        if(this.movies[index]['genre'].includes(this.filter_movie)) {
+          this.all_filter_movies.push(movie)
+        }
+      })
     }
   },
-
-  computed: {
-    // filterMovies() {
-
-    //     if(this.movies) {
-    //         return this.movies.filter(movie => {
-    //             // return true if the movies should be visible
-                
-
-    //             return movie.Title.toLowerCase().indexOf(this.search.toLowerCase()) != -1;
-    //       });
-    //     }else {
-    //         return 'testing'
-    //     }
-      
-    // }
-  }
 }
 </script>
 
