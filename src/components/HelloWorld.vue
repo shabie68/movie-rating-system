@@ -38,6 +38,28 @@
                 <td>{{fmovie.Year}}</td>
             </tr>
         </table> 
+
+
+        <select v-model="sort_movies" @change="sortMovies()">
+          <option value="rating" selected>Rating</option>
+          <option value="year">Year</option>
+          <option value="title">Title</option>
+        </select>
+
+        <table>
+            <caption>Filter Movies</caption>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Release Year</th>
+                </tr>    
+            </thead>
+
+            <tr v-for="(fmovie, fm) in all_filter_movies" :key="fm">
+                <td>{{fmovie.Title}}</td>
+                <td>{{fmovie.Year}}</td>
+            </tr>
+        </table> 
     </div>
 </template>
 
@@ -54,7 +76,10 @@ export default {
 		movies: null,
     search: '',
     filter_movie: '',
-    all_filter_movies: []
+    all_filter_movies: [],
+    sort_movies: 'rating',
+    sorted_movies: [],
+    years: []
 
 	}
   },
@@ -72,6 +97,7 @@ export default {
     .then(function(response) {
       if(response.data.Response == "True") {
         _this.displayMovieList(response.data.Search);
+        _this.sortMovies()
       }
     })  
 
@@ -82,6 +108,8 @@ export default {
       this.movies = movies;
       this.movies.forEach((movie, index) => {
         this.single_movie(movie, index)
+        this.years.push(movie.Year)
+
       })
     },
 
@@ -92,7 +120,6 @@ export default {
 
       axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=8e76539a`)
       .then((response) => {
-
         _this.movies[index]['genre'] = response.data.Genre
       })
     },
@@ -103,6 +130,24 @@ export default {
           this.all_filter_movies.push(movie)
         }
       })
+    },
+
+    sortMovies() {
+
+      if(this.sort_movies == 'rating') {
+        //
+        
+      }else if(this.sort_movies == 'year') {
+
+        this.movies.sort((a, b) => {
+          if (a.Year !== b.Year) return a.Year - b.Year;
+          return this.years.indexOf(a.Year) - this.years.indexOf(b.Year)
+        });
+      }
+      else {
+        
+        this.movies.sort((a, b) => a.Title.toLowerCase() > b.Title.toLowerCase() ? 1 : -1);
+      }
     }
   },
 }
