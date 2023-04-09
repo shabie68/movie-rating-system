@@ -12,6 +12,7 @@
                   <th>Release Year</th>
                   <th>Genre</th>
                   <th>Ratings</th>
+                  <th>Rate movie</th>
                 </tr>  
             </thead>
             
@@ -21,6 +22,10 @@
                 <td>{{movie.Year}}</td>
                 <td>{{movie.genre}}</td>
                 <td>{{movie.ratings}}</td>
+                <td>
+                  
+                  
+                </td>
             </tr>
         </table>
                
@@ -62,6 +67,12 @@
                 <td>{{fmovie.Year}}</td>
             </tr>
         </table> 
+        
+        <v-rating
+          v-model="movie_rating"
+          bg-color="orange-lighten-1"
+          color="blue"
+        ></v-rating>
     </div>
 </template>
 
@@ -76,6 +87,7 @@ export default {
   data() {
 	return {
 		movies: null,
+    movie_rating: 3,
     search: '',
     filter_movie: '',
     all_filter_movies: [],
