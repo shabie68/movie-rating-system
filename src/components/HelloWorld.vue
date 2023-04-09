@@ -11,6 +11,7 @@
                   <th>Title</th>
                   <th>Release Year</th>
                   <th>Genre</th>
+                  <th>Ratings</th>
                 </tr>  
             </thead>
             
@@ -19,6 +20,7 @@
                 <td>{{movie.Title}}</td>
                 <td>{{movie.Year}}</td>
                 <td>{{movie.genre}}</td>
+                <td>{{movie.ratings}}</td>
             </tr>
         </table>
                
@@ -79,7 +81,8 @@ export default {
     all_filter_movies: [],
     sort_movies: 'rating',
     sorted_movies: [],
-    years: []
+    years: [],
+    rating: [],
 
 	}
   },
@@ -97,7 +100,6 @@ export default {
     .then(function(response) {
       if(response.data.Response == "True") {
         _this.displayMovieList(response.data.Search);
-        _this.sortMovies()
       }
     })  
 
@@ -107,20 +109,51 @@ export default {
       
       this.movies = movies;
       this.movies.forEach((movie, index) => {
+        let __year = movie.Year.split('–')
+        __year.filter(n => n)
+
+        this.movies[index]['Year'] = __year[1] ? __year[1] : __year[0]
+        this.years.push(__year[1] ? __year[1] : __year[0])
+        if(movie.Ratings) {
+          this.rating.push(movie.Ratings)
+        }
         this.single_movie(movie, index)
-        this.years.push(movie.Year)
-
+                
       })
-    },
 
+      setTimeout(() => {
+        this.sortMovies()
+      }, 4000)
+      
+    },
 
     single_movie(movie, index) {
 
       let _this = this
+      let _rating = 0;
 
       axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=8e76539a`)
       .then((response) => {
         _this.movies[index]['genre'] = response.data.Genre
+
+        if(response.data.Ratings) {
+          response.data.Ratings.forEach((rating) => {
+
+            let __rating = Number(rating.Value.split("/")[0].replace('%', ''))
+            if(__rating > 10) {
+              _rating+=Number(__rating)/10
+            }else {
+              _rating+=Number(rating.Value.split("/")[0])
+            }
+
+            _this.movies[index]['ratings'] = (_rating/(response.data.Ratings.length)).toFixed(2)
+            _this.rating.push((_rating/(response.data.Ratings.length)).toFixed(2))  
+
+          })  
+        }
+       
+        
+
       })
     },
 
@@ -135,8 +168,11 @@ export default {
     sortMovies() {
 
       if(this.sort_movies == 'rating') {
-        //
         
+        this.movies.sort((a, b) => {
+          if (a.ratings !== b.ratings) return a.ratings - b.ratings;
+            return this.rating.indexOf(a.ratings) - this.rating.indexOf(b.ratings)
+          });
       }else if(this.sort_movies == 'year') {
 
         this.movies.sort((a, b) => {
@@ -145,7 +181,6 @@ export default {
         });
       }
       else {
-        
         this.movies.sort((a, b) => a.Title.toLowerCase() > b.Title.toLowerCase() ? 1 : -1);
       }
     }
