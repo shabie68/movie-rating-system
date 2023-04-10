@@ -67,19 +67,32 @@
                 <td>{{fmovie.Year}}</td>
             </tr>
         </table> 
-        
+
         <v-rating
-          v-model="movie_rating"
+          v-model="store_movie"
           bg-color="orange-lighten-1"
           color="blue"
         ></v-rating>
+
+        <p>Here is sort movie {{store_movie}}</p>
+
     </div>
 </template>
 
 <script>
 
 import axios from 'axios'
+import { useLocalStorage } from '@vueuse/core'
+
 export default {
+
+  setup(){
+    const store = useLocalStorage('movie',
+      {rating: 4}
+    )
+
+    return {store}
+  },
   name: 'HelloWorld',
   props: {
   },
@@ -97,6 +110,10 @@ export default {
     rating: [],
 
 	}
+  },
+
+  created() {
+    console.log(this.store.movie)
   },
 
   methods:{
@@ -135,8 +152,7 @@ export default {
 
       setTimeout(() => {
         this.sortMovies()
-      }, 4000)
-      
+      }, 2000)
     },
 
     single_movie(movie, index) {
@@ -197,6 +213,18 @@ export default {
       }
     }
   },
+
+  computed:{
+    store_movie:{
+
+      get() {
+        return this.store.rating
+      },
+      set(value) {
+        this.store.rating = value
+      }
+    }
+  }
 }
 </script>
 
