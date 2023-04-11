@@ -1,8 +1,87 @@
 <template>
     <div class="hello">
         <h1>Movie Rating System</h1>
+
+        <div>
+          <v-responsive
+            class="mx-auto"
+            max-width="344"
+          >
+            <v-text-field
+              type="search"
+              v-model="search"
+              label="Search movies"
+              @change="loadMovies()"
+
+            >
+              
+            </v-text-field>
+          </v-responsive>  
+
+          <div class="mignon-movies">
+            <v-container class="bg-surface-variant">
+              <v-row no-gutters>
+                <v-col
+                  v-for="(movie, m) in movies"
+                  :key="m"
+                  cols="12"
+                  sm="4"
+                >
+                  <v-sheet class="ma-2 pa-2">
+                       <v-card
+                        class="mx-auto"
+                        color="purple"
+                        elevation="10"
+                        width="360"
+                      >
+                        <div class="d-flex justify-between">
+                          <v-card-title class="flex-grow-1 flex-column align-start">
+                            <div class="text-h5">
+                              {{movie.Title}}
+                            </div>
+                            <div class="text-h6 font-weight-thin">{{movie.director}}</div>
+
+                            <div class="text-h6 font-weight-thin">{{movie.Year}}</div>
+                          </v-card-title>
+
+                          <v-img
+                            contain
+                            height="125px"
+                            :src="movie.Poster"
+                            style="flex-basis: 125px"
+                            class="flex-grow-0"
+                          ></v-img>
+                        </div>
+
+                        <v-divider></v-divider>
+
+                        <v-card-actions class="pa-4">
+                          Rate this album
+
+                          <v-spacer></v-spacer>
+
+                          <span class="text-grey-lighten-2 text-caption me-2">
+                            
+                          </span>
+
+                          <v-rating
+                            v-model="store_movie"
+                            color="white"
+                            active-color="yellow-accent-4"
+                            half-increments
+                            hover
+                            size="18"
+                          ></v-rating>
+                        </v-card-actions>
+                      </v-card>
+                  </v-sheet>
+                </v-col>
+              </v-row>
+            </v-container>
+          </div>
+        </div>
   
-        <table>
+        <!-- <table>
             <p><input type="search" name="search" v-model="search" @change="loadMovies()" placeholder="search by title"></p>
             <caption>All Movies</caption>
 
@@ -28,7 +107,7 @@
                 </td>
             </tr>
         </table>
-               
+                -->
         <table>
           <p><input type="search" name="filter_movie" v-model="filter_movie" @change="filterMovies()" placeholder="search by title"></p>
             <caption>Filter Movies</caption>
@@ -68,14 +147,7 @@
             </tr>
         </table> 
 
-        <v-rating
-          v-model="store_movie"
-          bg-color="orange-lighten-1"
-          color="blue"
-        ></v-rating>
-
-        <p>Here is sort movie {{store_movie}}</p>
-
+        <!-- <p>Here is sort movie {{store_movie}}</p> -->
     </div>
 </template>
 
@@ -87,8 +159,14 @@ import { useLocalStorage } from '@vueuse/core'
 export default {
 
   setup(){
+    // const store = useLocalStorage('movie',
+    //   {rating: 4}
+    // )
+
+
+
     const store = useLocalStorage('movie',
-      {rating: 4}
+      {rating: []}
     )
 
     return {store}
@@ -113,7 +191,8 @@ export default {
   },
 
   created() {
-    console.log(this.store.movie)
+    console.log("here is mvoie")
+    console.log(this.store.rating)   
   },
 
   methods:{
@@ -129,6 +208,8 @@ export default {
     .then(function(response) {
       if(response.data.Response == "True") {
         _this.displayMovieList(response.data.Search);
+
+
       }
     })  
 
@@ -163,6 +244,12 @@ export default {
       axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=8e76539a`)
       .then((response) => {
         _this.movies[index]['genre'] = response.data.Genre
+        _this.movies[index]['director'] = response.data.Director
+        _this.movies[index]['poster'] = response.data.Poster
+
+        _this.store.rating.push({title: _this.movies[index]['Title'], value: 0})
+        console.log("here is store")
+        console.log(_this.store.rating)
 
         if(response.data.Ratings) {
           response.data.Ratings.forEach((rating) => {
@@ -180,7 +267,6 @@ export default {
           })  
         }
        
-        
 
       })
     },
@@ -220,8 +306,9 @@ export default {
       get() {
         return this.store.rating
       },
-      set(value) {
-        this.store.rating = value
+      set(index, value) {
+        // this.store.rating = value
+        this.store.rating[index].title.push(value)
       }
     }
   }
