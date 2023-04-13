@@ -65,13 +65,14 @@
                           </span>
 
                           <v-rating
-                            v-model="store_movie"
+                            v-model="movie_rating"
                             color="white"
                             active-color="yellow-accent-4"
                             half-increments
                             hover
                             size="18"
-                          ></v-rating>
+                            @change="updateRating(movie.imdbID)"
+                            ></v-rating>
                         </v-card-actions>
                       </v-card>
                   </v-sheet>
@@ -159,16 +160,10 @@ import { useLocalStorage } from '@vueuse/core'
 export default {
 
   setup(){
-    // const store = useLocalStorage('movie',
-    //   {rating: 4}
-    // )
-
-
 
     const store = useLocalStorage('movie',
       {rating: []}
     )
-
     return {store}
   },
   name: 'HelloWorld',
@@ -190,10 +185,6 @@ export default {
 	}
   },
 
-  created() {
-    console.log("here is mvoie")
-    console.log(this.store.rating)   
-  },
 
   methods:{
 
@@ -207,6 +198,7 @@ export default {
     axios.get(`http://www.omdbapi.com/?apikey=8e76539a&s=${_search[0]}&y=${_search[1]}`)
     .then(function(response) {
       if(response.data.Response == "True") {
+
         _this.displayMovieList(response.data.Search);
 
 
@@ -246,10 +238,14 @@ export default {
         _this.movies[index]['genre'] = response.data.Genre
         _this.movies[index]['director'] = response.data.Director
         _this.movies[index]['poster'] = response.data.Poster
+        _this.movies[index]['imdbID'] = response.data.imdbID
 
-        _this.store.rating.push({title: _this.movies[index]['Title'], value: 0})
-        console.log("here is store")
-        console.log(_this.store.rating)
+        // _this.store.rating.push({title: _this.movies[index]['imdbID'], value: 0})
+
+        _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0}})
+        // _this.store.rating['imdbID'] = {id: _this.movies[index]['imdbID'], rating: 0}
+
+        // _this.store.rating['imdbID']['rating'] = 0
 
         if(response.data.Ratings) {
           response.data.Ratings.forEach((rating) => {
@@ -297,19 +293,16 @@ export default {
       else {
         this.movies.sort((a, b) => a.Title.toLowerCase() > b.Title.toLowerCase() ? 1 : -1);
       }
-    }
-  },
+    },
 
-  computed:{
-    store_movie:{
+    updateRating(id){
 
-      get() {
-        return this.store.rating
-      },
-      set(index, value) {
-        // this.store.rating = value
-        this.store.rating[index].title.push(value)
-      }
+      this.store.rating.forEach((_rating, index) => {
+        if(this.store.rating[index].imdbID.id == id) {
+          this.store.rating[index].imdbID.rating = this.movie_rating
+          this.movie_rating = this.store.rating[index].imdbID.rating
+        }
+      })
     }
   }
 }
