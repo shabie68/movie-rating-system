@@ -42,6 +42,8 @@
                             <div class="text-h6 font-weight-thin">{{movie.director}}</div>
 
                             <div class="text-h6 font-weight-thin">{{movie.Year}}</div>
+
+                            <div class="text-h6 font-weight-thin">Ratings:{{movie.ratings ? movie.ratings : 'N/A'}}</div>
                           </v-card-title>
 
                           <v-img
@@ -231,7 +233,7 @@ export default {
     single_movie(movie, index) {
 
       let _this = this
-      let _rating = 0;
+      // let _rating = 0;
 
       axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=8e76539a`)
       .then((response) => {
@@ -239,7 +241,7 @@ export default {
         _this.movies[index]['director'] = response.data.Director
         _this.movies[index]['poster'] = response.data.Poster
         _this.movies[index]['imdbID'] = response.data.imdbID
-
+        _this.movies[index]['all_ratings'] = response.data.Ratings
         // _this.store.rating.push({title: _this.movies[index]['imdbID'], value: 0})
 
         _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0}})
@@ -247,23 +249,24 @@ export default {
 
         // _this.store.rating['imdbID']['rating'] = 0
 
-        if(response.data.Ratings) {
-          response.data.Ratings.forEach((rating) => {
+        // if(response.data.Ratings) {
+        //   response.data.Ratings.forEach((rating) => {
 
-            let __rating = Number(rating.Value.split("/")[0].replace('%', ''))
-            if(__rating > 10) {
-              _rating+=Number(__rating)/10
-            }else {
-              _rating+=Number(rating.Value.split("/")[0])
-            }
+        //     let __rating = Number(rating.Value.split("/")[0].replace('%', ''))
+        //     if(__rating > 10) {
+        //       _rating+=Number(__rating)/10
+        //     }else {
+        //       _rating+=Number(rating.Value.split("/")[0])
+        //     }
 
-            _this.movies[index]['ratings'] = (_rating/(response.data.Ratings.length)).toFixed(2)
-            _this.rating.push((_rating/(response.data.Ratings.length)).toFixed(2))  
+        //     _this.movies[index]['ratings'] = (_rating/(response.data.Ratings.length)).toFixed(2)
 
-          })  
-        }
+        //     _this.rating.push((_rating/(response.data.Ratings.length)).toFixed(2))  
+
+        //   })  
+        // }
        
-
+        this.setRatings(response.data.Ratings, index)
       })
     },
 
@@ -295,12 +298,56 @@ export default {
       }
     },
 
+    setRatings(ratings, index, values = '') {
+
+      let _rating = 0;
+      if(ratings) {
+          ratings.forEach((rating) => {
+
+            let __rating = Number(rating.Value.split("/")[0].replace('%', ''))
+            if(__rating > 10) {
+              _rating+=Number(__rating)/10
+            }else {
+              _rating+=Number(rating.Value.split("/")[0])
+            }
+
+            this.movies[index]['ratings'] = (_rating/(ratings.length)).toFixed(2)
+
+            this.rating.push((_rating/(ratings.length)).toFixed(2))  
+
+          })  
+        }
+    },
+
     updateRating(id){
 
+      // let _this = this;
+
+      // let _movie = JSON.stringify(_this.movies[index])
+      // console.log(_movie)
+      // if(_movie) {
+        
+      //   this.setRatings(_movie['all_ratings'], index, '')
+      // }
+
+      let _movie = this.movies.filter((movie) => {
+  
+        return movie.imdbID == id;
+      })
+
+      _movie = JSON.stringify(_movie)
+      if(_movie) { 
+        _movie = JSON.parse(_movie)
+
+        if(_movie[0].all_ratings) {
+          this.setRatings(_movie[0].all_ratings,'', _movie)
+        }
+        
+      }
       this.store.rating.forEach((_rating, index) => {
         if(this.store.rating[index].imdbID.id == id) {
           this.store.rating[index].imdbID.rating = this.movie_rating
-          this.movie_rating = this.store.rating[index].imdbID.rating
+          this.movie_rating = this.store.rating[index].imdbID.rating      
         }
       })
     }
