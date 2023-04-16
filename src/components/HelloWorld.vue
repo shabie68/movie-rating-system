@@ -43,7 +43,7 @@
 
                             <div class="text-h6 font-weight-thin">{{movie.Year}}</div>
 
-                            <div class="text-h6 font-weight-thin">Ratings:{{movie.ratings ? movie.ratings : 'N/A'}}</div>
+                            <div class="text-h6 font-weight-thin">Ratings:{{movie.ratings }}</div>
                           </v-card-title>
 
                           <v-img
@@ -322,10 +322,11 @@ export default {
 
       let _rating = 0;
 
-      if(ratings) {
+      let _movie_rating = !values ? this.movies[index] : values[0]
+      if(ratings.length > 0) {
           ratings.forEach((rating) => {
 
-            let _movie_rating = !values ? this.movies[index] : values[0]
+            
 
             let __rating = Number(rating.Value.split("/")[0].replace('%', ''))
             if(__rating > 10) {
@@ -340,18 +341,25 @@ export default {
             // else {
             //   values[0].ratings = (_rating/(ratings.length)).toFixed(2)
             // }
-            console.log("here rating")
-            console.log(_rating+_movie_rating.movie_rating)
-            _rating+=_movie_rating.movie_rating
 
-            _movie_rating['ratings'] = (_rating/(ratings.length)).toFixed(2)
+            _rating+=(_movie_rating.movie_rating*2)
 
+            let avg_rating = _movie_rating.movie_rating  > 0 ? (_rating/(ratings.length+1)) : (_rating/(ratings.length)) 
+            
+
+            // _movie_rating['ratings'] = (_rating/(ratings.length)).toFixed(2)
+            _movie_rating['ratings'] = avg_rating.toFixed(2)
             this.rating.push(_movie_rating)
 
             // this.rating.push((_rating/(ratings.length)).toFixed(2))  
+            console.log("here is avg ratings****")
+            console.log(_movie_rating)
 
           })  
-        }
+      }else {
+        _movie_rating['ratings'] = _movie_rating.movie_rating
+        console.log(_movie_rating)
+      }
     },
 
     updateRating(id){
@@ -359,20 +367,6 @@ export default {
       let _movie = this.movies.filter((movie) => {
         return movie.imdbID == id;
       })
-
-      this.store.rating.forEach((_rating, index) => {
-        if(this.store.rating[index].imdbID.id == id) {
-          // this.store.rating[index].imdbID.rating = this.movie_rating
-          this.store.rating[index].imdbID.rating = _movie[0].movie_rating
-          // this.movie_rating = this.store.rating[index].imdbID.rating 
-          console.log("here is  rating****")
-          console.log(this.store.rating[index].imdbID.rating)  
-        }
-      })
-
-      // let _movie = this.movies.filter((movie) => {
-      //   return movie.imdbID == id;
-      // })
 
       _movie = JSON.stringify(_movie)
       if(_movie) { 
@@ -383,6 +377,20 @@ export default {
         }
         
       }
+
+      this.store.rating.forEach((_rating, index) => {
+        if(this.store.rating[index].imdbID.id == id) {
+          // this.store.rating[index].imdbID.rating = this.movie_rating
+          this.store.rating[index].imdbID.rating = _movie[0].movie_rating
+          // this.movie_rating = this.store.rating[index].imdbID.rating 
+        }
+      })
+
+      // let _movie = this.movies.filter((movie) => {
+      //   return movie.imdbID == id;
+      // })
+
+      
     }
   }
 }
