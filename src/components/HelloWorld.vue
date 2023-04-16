@@ -67,7 +67,7 @@
                           </span>
 
                           <v-rating
-                            v-model="movie_rating"
+                            v-model="movie.movie_rating"
                             color="white"
                             active-color="yellow-accent-4"
                             half-increments
@@ -242,9 +242,25 @@ export default {
         _this.movies[index]['poster'] = response.data.Poster
         _this.movies[index]['imdbID'] = response.data.imdbID
         _this.movies[index]['all_ratings'] = response.data.Ratings
-        // _this.store.rating.push({title: _this.movies[index]['imdbID'], value: 0})
+        _this.movies[index]['movie_rating'] = null;
 
-        _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0}})
+        this.store.rating.forEach((_rating, _index) => {
+        if(this.store.rating[_index].imdbID.id == _this.movies[index]['imdbID']) {
+          console.log("here is  rating****")
+          console.log(this.store.rating[index].imdbID.rating) 
+          
+          _this.movies[index]['movie_rating'] = this.store.rating[index].imdbID.rating ?this.store.rating[index].imdbID.rating : 0;
+          
+        }
+      })
+
+
+        // _this.store.rating.push({title: _this.movies[index]['imdbID'], value: 0})
+        const found = _this.store.rating.find(element => element['imdbID'].id == _this.movies[index]['imdbID']);
+        if(!found) {
+          _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0}})  
+        }   
+        
         // _this.store.rating['imdbID'] = {id: _this.movies[index]['imdbID'], rating: 0}
 
         // _this.store.rating['imdbID']['rating'] = 0
@@ -299,10 +315,17 @@ export default {
     },
 
     setRatings(ratings, index, values = '') {
+      console.log("here is movies")
+      console.log(values)
+
+      console.log(ratings)
 
       let _rating = 0;
+
       if(ratings) {
           ratings.forEach((rating) => {
+
+            let _movie_rating = !values ? this.movies[index] : values[0]
 
             let __rating = Number(rating.Value.split("/")[0].replace('%', ''))
             if(__rating > 10) {
@@ -311,29 +334,45 @@ export default {
               _rating+=Number(rating.Value.split("/")[0])
             }
 
-            this.movies[index]['ratings'] = (_rating/(ratings.length)).toFixed(2)
+            // if(!values) {
+            //   this.movies[index]['ratings'] = (_rating/(ratings.length)).toFixed(2)
+            // }
+            // else {
+            //   values[0].ratings = (_rating/(ratings.length)).toFixed(2)
+            // }
+            console.log("here rating")
+            console.log(_rating+_movie_rating.movie_rating)
+            _rating+=_movie_rating.movie_rating
 
-            this.rating.push((_rating/(ratings.length)).toFixed(2))  
+            _movie_rating['ratings'] = (_rating/(ratings.length)).toFixed(2)
+
+            this.rating.push(_movie_rating)
+
+            // this.rating.push((_rating/(ratings.length)).toFixed(2))  
 
           })  
         }
     },
 
     updateRating(id){
-
-      // let _this = this;
-
-      // let _movie = JSON.stringify(_this.movies[index])
-      // console.log(_movie)
-      // if(_movie) {
-        
-      //   this.setRatings(_movie['all_ratings'], index, '')
-      // }
-
+      
       let _movie = this.movies.filter((movie) => {
-  
         return movie.imdbID == id;
       })
+
+      this.store.rating.forEach((_rating, index) => {
+        if(this.store.rating[index].imdbID.id == id) {
+          // this.store.rating[index].imdbID.rating = this.movie_rating
+          this.store.rating[index].imdbID.rating = _movie[0].movie_rating
+          // this.movie_rating = this.store.rating[index].imdbID.rating 
+          console.log("here is  rating****")
+          console.log(this.store.rating[index].imdbID.rating)  
+        }
+      })
+
+      // let _movie = this.movies.filter((movie) => {
+      //   return movie.imdbID == id;
+      // })
 
       _movie = JSON.stringify(_movie)
       if(_movie) { 
@@ -344,12 +383,6 @@ export default {
         }
         
       }
-      this.store.rating.forEach((_rating, index) => {
-        if(this.store.rating[index].imdbID.id == id) {
-          this.store.rating[index].imdbID.rating = this.movie_rating
-          this.movie_rating = this.store.rating[index].imdbID.rating      
-        }
-      })
     }
   }
 }
