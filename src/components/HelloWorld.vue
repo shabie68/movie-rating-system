@@ -16,7 +16,9 @@
             >
               
             </v-text-field>
-          </v-responsive>  
+          </v-responsive> 
+
+
 
           <div class="mignon-movies">
             <v-container class="bg-surface-variant">
@@ -28,6 +30,9 @@
                   sm="4"
                 >
                   <v-sheet class="ma-2 pa-2">
+                    
+
+
                        <v-card
                         class="mx-auto"
                         color="purple"
@@ -35,6 +40,7 @@
                         width="360"
                       >
                         <div class="d-flex justify-between">
+                          
                           <v-card-title class="flex-grow-1 flex-column align-start">
                             <div class="text-h5">
                               {{movie.Title}}
@@ -75,6 +81,17 @@
                             size="18"
                             @change="updateRating(movie.imdbID)"
                             ></v-rating>
+
+                            <v-responsive
+                            class="mx-auto"
+                            max-width="344"
+                          >
+                            <v-text-field
+                              label="write review"
+                              hide-details="auto"
+                              v-model="movie.write_review"
+                            ></v-text-field>
+                          </v-responsive>
                         </v-card-actions>
                       </v-card>
                   </v-sheet>
@@ -243,6 +260,7 @@ export default {
         _this.movies[index]['imdbID'] = response.data.imdbID
         _this.movies[index]['all_ratings'] = response.data.Ratings
         _this.movies[index]['movie_rating'] = null;
+        _this.movies[index]['write_review'] = null;
 
         this.store.rating.forEach((_rating, _index) => {
         if(this.store.rating[_index].imdbID.id == _this.movies[index]['imdbID']) {
@@ -258,7 +276,7 @@ export default {
         // _this.store.rating.push({title: _this.movies[index]['imdbID'], value: 0})
         const found = _this.store.rating.find(element => element['imdbID'].id == _this.movies[index]['imdbID']);
         if(!found) {
-          _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0}})  
+          _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0, review: _this.mvoies[index]['write_review']}})  
         }   
         
         // _this.store.rating['imdbID'] = {id: _this.movies[index]['imdbID'], rating: 0}
@@ -378,10 +396,13 @@ export default {
         
       }
 
+      console.log("here is movie")
+      console.log(_movie[0])
       this.store.rating.forEach((_rating, index) => {
         if(this.store.rating[index].imdbID.id == id) {
           // this.store.rating[index].imdbID.rating = this.movie_rating
           this.store.rating[index].imdbID.rating = _movie[0].movie_rating
+          // this.store.rating[index].
           // this.movie_rating = this.store.rating[index].imdbID.rating 
         }
       })
