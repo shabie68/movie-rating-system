@@ -91,6 +91,9 @@
                               hide-details="auto"
                               v-model="movie.write_review"
                             ></v-text-field>
+                            <button @click="updateRating(movie.imdbID, 'review')">
+                              Write Review
+                            </button>
                           </v-responsive>
                         </v-card-actions>
                       </v-card>
@@ -263,12 +266,16 @@ export default {
         _this.movies[index]['write_review'] = null;
 
         this.store.rating.forEach((_rating, _index) => {
-        if(this.store.rating[_index].imdbID.id == _this.movies[index]['imdbID']) {
-          console.log("here is  rating****")
-          console.log(this.store.rating[index].imdbID.rating) 
-          
+          console.log(_this.store.rating[_index].imdbID.id)
+          console.log(_this.movies[index].imdbID)
+        if(this.store.rating[_index].imdbID.id == _this.movies[index].imdbID) {
+          // console.log("here is store id")
+          // console.log(this.store.rating[_index].imdbID.id)
+          // console.log(_this.movies[index]['write_review'])
+          // console.log(_this.movies[index]['imdbID'])
           _this.movies[index]['movie_rating'] = this.store.rating[index].imdbID.rating ?this.store.rating[index].imdbID.rating : 0;
-          
+
+          _this.movies[index]['write_review'] = this.store.rating[index].imdbID.review ? this.store.rating[index].imdbID.review: ''
         }
       })
 
@@ -276,7 +283,8 @@ export default {
         // _this.store.rating.push({title: _this.movies[index]['imdbID'], value: 0})
         const found = _this.store.rating.find(element => element['imdbID'].id == _this.movies[index]['imdbID']);
         if(!found) {
-          _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0, review: _this.mvoies[index]['write_review']}})  
+          _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0, review: _this.movies[index]['write_review']}}) 
+           
         }   
         
         // _this.store.rating['imdbID'] = {id: _this.movies[index]['imdbID'], rating: 0}
@@ -333,16 +341,12 @@ export default {
     },
 
     setRatings(ratings, index, values = '') {
-      console.log("here is movies")
-      console.log(values)
-
-      console.log(ratings)
 
       let _rating = 0;
 
       let _movie_rating = !values ? this.movies[index] : values[0]
       if(ratings.length > 0) {
-          ratings.forEach((rating) => {
+          let __ratings__ = ratings.map((rating) => {
 
             
 
@@ -352,7 +356,7 @@ export default {
             }else {
               _rating+=Number(rating.Value.split("/")[0])
             }
-
+            return _rating
             // if(!values) {
             //   this.movies[index]['ratings'] = (_rating/(ratings.length)).toFixed(2)
             // }
@@ -360,49 +364,70 @@ export default {
             //   values[0].ratings = (_rating/(ratings.length)).toFixed(2)
             // }
 
-            _rating+=(_movie_rating.movie_rating*2)
+            // _rating+=(_movie_rating.movie_rating*2)
 
-            let avg_rating = _movie_rating.movie_rating  > 0 ? (_rating/(ratings.length+1)) : (_rating/(ratings.length)) 
+            // let avg_rating = _movie_rating.movie_rating  > 0 ? (_rating/(ratings.length+1)) : (_rating/(ratings.length)) 
+
+            // console.log("here is rating")
+            // console.log(_rating)
+            // // _rating+=_movie_rating.movie_rating > 0 ? _movie_rating.movie_rating : 0;
+            // let avg_rating = _movie_rating.movie_rating  > 0 ? (_rating/(ratings.length+1)) : (_rating/(ratings.length)) 
             
 
-            // _movie_rating['ratings'] = (_rating/(ratings.length)).toFixed(2)
-            _movie_rating['ratings'] = avg_rating.toFixed(2)
-            this.rating.push(_movie_rating)
+            // // _movie_rating['ratings'] = (_rating/(ratings.length)).toFixed(2)
+            // console.log("here is avg ratings****")
+            // console.log(avg_rating)
+            // //convert avg ratings to be on scale of 5
+            // _movie_rating['ratings'] = (avg_rating).toFixed(2)
+            // this.rating.push(_movie_rating)
 
             // this.rating.push((_rating/(ratings.length)).toFixed(2))  
-            console.log("here is avg ratings****")
-            console.log(_movie_rating)
+            
 
-          })  
+          })
+
+          let total_ratings = __ratings__.length
+          //add user rating to it
+
+          __ratings__ = __ratings__[total_ratings-1]
+
+          total_ratings += _movie_rating.movie_rating > 0 ? 1 : 0
+          __ratings__+= _movie_rating.movie_rating > 0 ? _movie_rating.movie_rating*2 : _movie_rating.movie_rating 
+
+          let avg_rating = (__ratings__)/total_ratings.toFixed(2)
+
+          _movie_rating['ratings'] = avg_rating/2
+          // this.rating.push(_movie_rating)
+          
       }else {
         _movie_rating['ratings'] = _movie_rating.movie_rating
-        console.log(_movie_rating)
       }
     },
 
-    updateRating(id){
+    updateRating(id, action="rating"){
       
       let _movie = this.movies.filter((movie) => {
         return movie.imdbID == id;
       })
 
       _movie = JSON.stringify(_movie)
+
       if(_movie) { 
         _movie = JSON.parse(_movie)
-
-        if(_movie[0].all_ratings) {
-          this.setRatings(_movie[0].all_ratings,'', _movie)
+        if(action ==='rating') {
+          if(_movie[0].all_ratings) {
+            this.setRatings(_movie[0].all_ratings,'', _movie)
+          }  
         }
+        
         
       }
 
-      console.log("here is movie")
-      console.log(_movie[0])
       this.store.rating.forEach((_rating, index) => {
         if(this.store.rating[index].imdbID.id == id) {
           // this.store.rating[index].imdbID.rating = this.movie_rating
           this.store.rating[index].imdbID.rating = _movie[0].movie_rating
-          // this.store.rating[index].
+          this.store.rating[index].imdbID.review = _movie[0].write_review
           // this.movie_rating = this.store.rating[index].imdbID.rating 
         }
       })
@@ -412,7 +437,9 @@ export default {
       // })
 
       
-    }
+    },
+
+
   }
 }
 </script>
