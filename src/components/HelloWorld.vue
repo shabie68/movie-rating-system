@@ -265,19 +265,37 @@ export default {
         _this.movies[index]['movie_rating'] = null;
         _this.movies[index]['write_review'] = null;
 
-        this.store.rating.forEach((_rating, _index) => {
-          console.log(_this.store.rating[_index].imdbID.id)
-          console.log(_this.movies[index].imdbID)
-        if(this.store.rating[_index].imdbID.id == _this.movies[index].imdbID) {
-          // console.log("here is store id")
-          // console.log(this.store.rating[_index].imdbID.id)
-          // console.log(_this.movies[index]['write_review'])
-          // console.log(_this.movies[index]['imdbID'])
-          _this.movies[index]['movie_rating'] = this.store.rating[index].imdbID.rating ?this.store.rating[index].imdbID.rating : 0;
+        let load_rating_movie = this.store.rating.filter((_rate) => {
+          return _rate.imdbID.movie_id == _this.movies[index].imdbID
+        })
 
-          _this.movies[index]['write_review'] = this.store.rating[index].imdbID.review ? this.store.rating[index].imdbID.review: ''
+        load_rating_movie = JSON.parse(JSON.stringify(load_rating_movie))
+        console.log(load_rating_movie)
+        if(load_rating_movie.length > 0 ) {
+          this.store.rating.forEach((_rating, _index) => {
+          
+            // if(this.store.rating[_index].imdbID.id == _this.movies[index].imdbID) {
+              if(this.store.rating[_index].imdbID.id == load_rating_movie[0].imdbID.movie_id) {
+
+              // _this.movies[index]['movie_rating'] = this.store.rating[index].imdbID.rating ?this.store.rating[index].imdbID.rating : 0;
+
+              // _this.movies[index]['write_review'] = this.store.rating[index].imdbID.review ? this.store.rating[index].imdbID.review: ''
+              
+              _this.movies[index]['movie_rating'] = load_rating_movie[0].imdbID.rating ?load_rating_movie[0].rating.imdbID.rating : 0
+
+              _this.movies[index]['write_review'] = load_rating_movie[0].imdbID.review ? load_rating_movie[0].rating.imdbID.review: ''
+            }
+          })
         }
-      })
+      //   this.store.rating.forEach((_rating, _index) => {
+          
+      //   if(this.store.rating[_index].imdbID.id == _this.movies[index].imdbID) {
+
+      //     _this.movies[index]['movie_rating'] = this.store.rating[index].imdbID.rating ?this.store.rating[index].imdbID.rating : 0;
+
+      //     _this.movies[index]['write_review'] = this.store.rating[index].imdbID.review ? this.store.rating[index].imdbID.review: ''
+      //   }
+      // })
 
 
         // _this.store.rating.push({title: _this.movies[index]['imdbID'], value: 0})
@@ -428,6 +446,7 @@ export default {
           // this.store.rating[index].imdbID.rating = this.movie_rating
           this.store.rating[index].imdbID.rating = _movie[0].movie_rating
           this.store.rating[index].imdbID.review = _movie[0].write_review
+          this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
           // this.movie_rating = this.store.rating[index].imdbID.rating 
         }
       })
