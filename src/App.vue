@@ -1,18 +1,18 @@
 <template>
 
   <!-- <HelloWorld/> -->
-  <ComposableVue />
+  <ComposableComp />
 </template>
 
 <script>
 // import HelloWorld from './components/HelloWorld.vue'
-import ComposableVue from './components/Composable.vue'
+import ComposableComp from './components/ComposableComp.vue'
 
 export default {
   name: 'App',
   components: {
     // HelloWorld,
-    ComposableVue
+    ComposableComp
   }
 }
 </script>
