@@ -1,3 +1,13 @@
+<!-- <script setup>
+import { useRateReview } from '../rate_review.js'
+
+const { x, y } = useRateReview()
+console.log("here is review and rating****")
+console.log(x)
+console.log(y)
+</script> -->
+
+
 <template>
     <div class="hello">
         <h1>Movie Rating System</h1>
@@ -87,12 +97,16 @@
                             max-width="344"
                           >
                             <v-text-field
-                              label="write review"
+                              label="write_review"
                               hide-details="auto"
                               v-model="movie.write_review"
                             ></v-text-field>
                             <button @click="updateRating(movie.imdbID, 'review')">
                               Write Review
+                            </button>
+
+                            <button id="composable">
+                                Write composible
                             </button>
                           </v-responsive>
                         </v-card-actions>
@@ -178,15 +192,18 @@
 
 import axios from 'axios'
 import { useLocalStorage } from '@vueuse/core'
+import { useRateReview } from '../rate_review.js'
 
 export default {
-
   setup(){
 
+    const { x, y } = useRateReview()
+
+    //don't touch it
     const store = useLocalStorage('movie',
       {rating: []}
     )
-    return {store}
+    return {store, x, y}
   },
   name: 'HelloWorld',
   props: {
@@ -270,20 +287,30 @@ export default {
         })
 
         load_rating_movie = JSON.parse(JSON.stringify(load_rating_movie))
-        console.log(load_rating_movie)
+
+        // console.log(load_rating_movie)
         if(load_rating_movie.length > 0 ) {
           this.store.rating.forEach((_rating, _index) => {
           
             // if(this.store.rating[_index].imdbID.id == _this.movies[index].imdbID) {
               if(this.store.rating[_index].imdbID.id == load_rating_movie[0].imdbID.movie_id) {
+                console.log("Inside***")
+                console.log(load_rating_movie[0].imdbID.rating)
 
               // _this.movies[index]['movie_rating'] = this.store.rating[index].imdbID.rating ?this.store.rating[index].imdbID.rating : 0;
 
               // _this.movies[index]['write_review'] = this.store.rating[index].imdbID.review ? this.store.rating[index].imdbID.review: ''
-              
-              _this.movies[index]['movie_rating'] = load_rating_movie[0].imdbID.rating ?load_rating_movie[0].rating.imdbID.rating : 0
 
-              _this.movies[index]['write_review'] = load_rating_movie[0].imdbID.review ? load_rating_movie[0].rating.imdbID.review: ''
+
+
+              _this.movies[index]['movie_rating'] = load_rating_movie[0].imdbID.rating ?load_rating_movie[0].imdbID.rating : 0
+
+
+              _this.movies[index]['write_review'] = load_rating_movie[0].imdbID.review ? load_rating_movie[0].imdbID.review: ''
+
+              console.log("Here ****")
+              console.log("Here is the movie")
+              console.log(_this.movies[index])
             }
           })
         }
@@ -412,6 +439,8 @@ export default {
           total_ratings += _movie_rating.movie_rating > 0 ? 1 : 0
           __ratings__+= _movie_rating.movie_rating > 0 ? _movie_rating.movie_rating*2 : _movie_rating.movie_rating 
 
+          console.log(_movie_rating)
+          console.log(__ratings__)
           let avg_rating = (__ratings__)/total_ratings.toFixed(2)
 
           _movie_rating['ratings'] = avg_rating/2

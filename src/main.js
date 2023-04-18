@@ -16,5 +16,4 @@ const vuetify = createVuetify({
 
 createApp(App).use(vuetify, {
 	iconfont: 'mdi'
-})
-	.mount('#app')
+}).mount('#app')
