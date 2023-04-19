@@ -1,11 +1,12 @@
-import {ref} from 'vue'
+// import {ref} from 'vue'
 // import {useLocalStorage} from '@vueuse/core'
 
 export function useUpdateMovieInfo(store, movie, index) {
-	let _store = ref(0)
+	// let _store = ref(0)
 
 	console.log("here is movie")
 	console.log(movie)
+	console.log(index)
 	function pushR(store, movie, index) {
 		//store
 		store.rating[index].imdbID.rating = movie[0].movie_rating
@@ -14,7 +15,7 @@ export function useUpdateMovieInfo(store, movie, index) {
 		return {store}
 	}
 
-	_store.value = pushR(store, movie, index)
+	// _store.value = pushR(store, movie, index)
 
-	return {_store}
+	return {pushR}
 }

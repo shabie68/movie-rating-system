@@ -181,7 +181,11 @@ console.log(y)
             </tr>
         </table> 
 
-        <p @click="testing">Here is sort movie {{}}</p>
+        <p @click="test.pushR(2, 'testing', 'fdf')">Here is sort movie {{test.update_rating}}</p>
+
+        <div>
+          <button @click="test.pushR(5*5, 'Movie_rating', 4)">Click{{test.update_review}}</button>
+        </div>
     </div>
 </template>
 
@@ -202,13 +206,24 @@ export default {
     let test_review = ref('')
     let test_id = ref('')
     let test = useTest(test_rating, test_review, test_id)
-    console.log("Here is test")
-    console.log(test)
-    //don't touch it
+
+
+
+
+
     const store = useLocalStorage('movie',
       {rating: []}
     )
-    return {store, test}
+
+
+    let test_movie = ref(null)
+
+    let movie_information = useMovieRating(store, test_movie)
+
+    let index = ref(0)
+    let update_movie_information = useUpdateMovieInfo(store, test_movie, index)
+
+    return {store, test, movie_information, update_movie_information}
   },
   name: 'HelloWorld',
   props: {
@@ -347,8 +362,14 @@ export default {
            
         // }
 
-        useMovieRating(_this.store, _this.movies[index])
+        // useMovieRating(_this.store, _this.movies[index])
 
+        const found = _this.store.rating.find(element => element['imdbID'].id == _this.movies[index]['imdbID']);
+        if(!found) {
+          this.movie_information.pushR(_this.store, _this.movies[index])  
+        }
+        
+        
 
         
         // _this.store.rating['imdbID'] = {id: _this.movies[index]['imdbID'], rating: 0}
@@ -504,7 +525,8 @@ export default {
           // this.store.rating[index].imdbID.review = _movie[0].write_review
           // this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
 
-          useUpdateMovieInfo(this.store, _movie, index)
+          // useUpdateMovieInfo(this.store, _movie, index)
+          this.update_movie_information.pushR(this.store, _movie, index)
         }
       })
 

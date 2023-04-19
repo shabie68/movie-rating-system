@@ -13,8 +13,9 @@ export function useTest(rating, review,id) {
 
 	function pushR(rating, review, id) {
 		//store
-
-		update_rating = rating.value
+		console.log("here is review")
+		console.log(review)
+		update_rating.value
 		update_review = review.value
 		update_id = id.value
 		console.log(rating)
@@ -38,5 +39,5 @@ export function useTest(rating, review,id) {
 	pushR(update_rating,update_review,update_id)
 	console.log("Here is update")
 	console.log(update_rating)
-	return {update_rating}
+	return {update_rating,update_review,pushR}
 }

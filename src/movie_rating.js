@@ -1,8 +1,8 @@
-import {ref} from 'vue'
+// import {ref} from 'vue'
 // import {useLocalStorage} from '@vueuse/core'
 
 export function useMovieRating(store, movie) {
-	let _store = ref(0)
+	// let _store = ref(0)
 
 	function pushR(store, movie) {
 		//store
@@ -16,10 +16,10 @@ export function useMovieRating(store, movie) {
 					}
 			}
 		) 
-		return {store}
+		// return {store}
 	}
 
-	_store.value = pushR(store, movie)
+	// _store.value = pushR(store, movie)
 
-	return {_store}
+	return {movie, pushR}
 }
