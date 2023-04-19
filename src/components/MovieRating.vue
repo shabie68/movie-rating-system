@@ -181,7 +181,7 @@ console.log(y)
             </tr>
         </table> 
 
-        <!-- <p>Here is sort movie {{store_movie}}</p> -->
+        <p @click="testing">Here is sort movie {{}}</p>
     </div>
 </template>
 
@@ -191,17 +191,24 @@ import axios from 'axios'
 import { useLocalStorage } from '@vueuse/core'
 import { useMovieRating } from '../movie_rating.js'
 import {useUpdateMovieInfo} from '../update_movie_info.js'
+import {useTest} from '../test.js'
+import {ref} from 'vue'
 
 export default {
   setup(){
 
     // const { x, y } = useRateReview()
-
+    let  test_rating = ref(0)
+    let test_review = ref('')
+    let test_id = ref('')
+    let test = useTest(test_rating, test_review, test_id)
+    console.log("Here is test")
+    console.log(test)
     //don't touch it
     const store = useLocalStorage('movie',
       {rating: []}
     )
-    return {store}
+    return {store, test}
   },
   name: 'HelloWorld',
   props: {
@@ -211,6 +218,7 @@ export default {
 	return {
 		movies: null,
     movie_rating: 3,
+    t_: '',
     search: '',
     filter_movie: '',
     all_filter_movies: [],
@@ -225,6 +233,12 @@ export default {
 
   methods:{
 
+  testing() {
+    console.log("here is testing ***")
+    this.test.update_rating+=1
+    console.log(this.test)
+    console.log(this.test)
+  },
   loadMovies() {
 
     var _this = this
