@@ -1,31 +1,39 @@
-import {ref, onMounted, onUnmounted} from 'vue'
+import {ref} from 'vue'
+// import {useLocalStorage} from '@vueuse/core'
 
-export function useRateReview() {
-	// const rating = ref(0)
-	// const review = ref(0)
+export function useRateReview(store, movie, count) {
+	let _store = ref(0)
 
-	let greeting = ref(0)
+	function pushR(store, movie, count) {
+		//store
+		store.rating.push(
+			{
+				imdbID: 
+					{
+						id: movie['id'], 
+						rating: 0,
+						total_movies: count, 
+						review: movie['name'],
 
-	// function update(event) {
-	// 	rating.value = event.rating
-	// 	review.value = event.review
-	// }
+						
+					}
+			}
+		) 
 
+		return {store}
+	}
 	// let btn = document.getElementById('composable')
 
 	// setTimeout(() => {
 	// 	onMounted(() => btn.addEventListener('click', update))
 	// 	onUnmounted(() => btn.removeEventListener('click', update))
 	// }, 2000)
-	function update() {
-		greeting.value = 'Welcome to composable!'
 
-	}
 
-	onMounted(() => window.addEventListener('mousemove', update))
-	onUnmounted(() => window.removeEventListener('mousemove', update))	
+	// onMounted(() => window.addEventListener('mousemove', pushR))
+	// onUnmounted(() => window.removeEventListener('mousemove', pushR))	
+	_store.value = pushR(store, movie, count)
 
-	
 
-	return {greeting}
+	return {_store}
 }

@@ -189,7 +189,8 @@ console.log(y)
 
 import axios from 'axios'
 import { useLocalStorage } from '@vueuse/core'
-// import { useRateReview } from '../rate_review.js'
+import { useMovieRating } from '../movie_rating.js'
+import {useUpdateMovieInfo} from '../update_movie_info.js'
 
 export default {
   setup(){
@@ -324,11 +325,17 @@ export default {
 
 
         // _this.store.rating.push({title: _this.movies[index]['imdbID'], value: 0})
-        const found = _this.store.rating.find(element => element['imdbID'].id == _this.movies[index]['imdbID']);
-        if(!found) {
-          _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0, review: _this.movies[index]['write_review']}}) 
+        // const found = _this.store.rating.find(element => element['imdbID'].id == _this.movies[index]['imdbID']);
+
+        //later uncomment this because we are using compsoable
+        // if(!found) {
+        //   _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0, review: _this.movies[index]['write_review']}}) 
            
-        }   
+        // }
+
+        useMovieRating(_this.store, _this.movies[index])
+
+
         
         // _this.store.rating['imdbID'] = {id: _this.movies[index]['imdbID'], rating: 0}
 
@@ -466,15 +473,30 @@ export default {
         }
       }
 
+      //later uncomment it because of usage compsoable
+      // this.store.rating.forEach((_rating, index) => {
+      //   if(this.store.rating[index].imdbID.id == id) {
+      //     // this.store.rating[index].imdbID.rating = this.movie_rating
+      //     this.store.rating[index].imdbID.rating = _movie[0].movie_rating
+      //     this.store.rating[index].imdbID.review = _movie[0].write_review
+      //     this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
+      //     // this.movie_rating = this.store.rating[index].imdbID.rating 
+      //   }
+      // })
+
       this.store.rating.forEach((_rating, index) => {
         if(this.store.rating[index].imdbID.id == id) {
-          // this.store.rating[index].imdbID.rating = this.movie_rating
-          this.store.rating[index].imdbID.rating = _movie[0].movie_rating
-          this.store.rating[index].imdbID.review = _movie[0].write_review
-          this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
-          // this.movie_rating = this.store.rating[index].imdbID.rating 
+          // this.store.rating[index].imdbID.rating = _movie[0].movie_rating
+          // this.store.rating[index].imdbID.review = _movie[0].write_review
+          // this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
+
+          useUpdateMovieInfo(this.store, _movie, index)
         }
       })
+
+      
+
+
     },
 
 

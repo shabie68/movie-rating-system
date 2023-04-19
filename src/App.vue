@@ -1,18 +1,21 @@
 <template>
 
   <!-- <HelloWorld/> -->
-  <ComposableComp />
+  <!-- <ComposableComp /> -->
+  <MovieRating />
 </template>
 
 <script>
 // import HelloWorld from './components/HelloWorld.vue'
-import ComposableComp from './components/ComposableComp.vue'
+import MovieRating from './components/MovieRating.vue'
+// import ComposableComp from './components/ComposableComp.vue'
 
 export default {
   name: 'App',
   components: {
     // HelloWorld,
-    ComposableComp
+    MovieRating
+    // ComposableComp
   }
 }
 </script>
