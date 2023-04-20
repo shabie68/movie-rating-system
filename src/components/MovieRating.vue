@@ -29,6 +29,19 @@ console.log(y)
           </v-responsive> 
 
 
+          <v-responsive
+            class="mx-auto"
+            max-width="344"
+          >
+            <v-text-field
+              type="text"
+              v-model="list_name"
+              label="Enter list name"
+
+            >
+              
+            </v-text-field>
+          </v-responsive> 
 
           <div class="mignon-movies">
             <v-container class="bg-surface-variant">
@@ -41,7 +54,6 @@ console.log(y)
                 >
                   <v-sheet class="ma-2 pa-2">
                     
-
 
                        <v-card
                         class="mx-auto"
@@ -74,7 +86,20 @@ console.log(y)
                         <v-divider></v-divider>
 
                         <v-card-actions class="pa-4">
-                          Rate this album
+                          <div>
+                            <p>
+                              <v-checkbox
+                                v-model="movie.list_movie"
+                                label="Select"
+                                @click="createCustomList(movie.imdbID)"
+                                id="movie.imdbID"
+                              ></v-checkbox>
+                            </p>
+                          </div>
+                          <span>
+                            Rate this album  
+                          </span>
+                          
 
                           <v-spacer></v-spacer>
 
@@ -186,6 +211,10 @@ console.log(y)
         <div>
           <button @click="test.pushR(5*5, 'Movie_rating', 4)">Click{{test.update_review}}</button>
         </div>
+
+        <div>
+          <button @click="showCustomList">Click{{test.update_review}}</button>
+        </div>
     </div>
 </template>
 
@@ -195,6 +224,7 @@ import axios from 'axios'
 import { useLocalStorage } from '@vueuse/core'
 import { useMovieRating } from '../movie_rating.js'
 import {useUpdateMovieInfo} from '../update_movie_info.js'
+import {useGetMovies} from '../get_movies.js'
 import {useTest} from '../test.js'
 import {ref} from 'vue'
 
@@ -206,10 +236,6 @@ export default {
     let test_review = ref('')
     let test_id = ref('')
     let test = useTest(test_rating, test_review, test_id)
-
-
-
-
 
     const store = useLocalStorage('movie',
       {rating: []}
@@ -223,10 +249,16 @@ export default {
     let index = ref(0)
     let update_movie_information = useUpdateMovieInfo(store, test_movie, index)
 
-    return {store, test, movie_information, update_movie_information}
+    let get_all_movies = useGetMovies(store)
+
+    return {store, test, movie_information, update_movie_information, get_all_movies}
   },
   name: 'HelloWorld',
   props: {
+  },
+
+  created() {
+    this.showCustomList()
   },
 
   data() {
@@ -234,6 +266,7 @@ export default {
 		movies: null,
     movie_rating: 3,
     t_: '',
+    list_name: '',
     search: '',
     filter_movie: '',
     all_filter_movies: [],
@@ -309,6 +342,8 @@ export default {
         _this.movies[index]['all_ratings'] = response.data.Ratings
         _this.movies[index]['movie_rating'] = null;
         _this.movies[index]['write_review'] = null;
+        _this.movies[index]['list_name'] = null;
+        _this.movies[index]['list_movie'] = null;
 
         let load_rating_movie = this.store.rating.filter((_rate) => {
           return _rate.imdbID.movie_id == _this.movies[index].imdbID
@@ -526,16 +561,71 @@ export default {
           // this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
 
           // useUpdateMovieInfo(this.store, _movie, index)
+
           this.update_movie_information.pushR(this.store, _movie, index)
         }
       })
-
-      
-
-
     },
 
+    createCustomList(id) {
+      let _movie = this.movies.filter((movie) => {
+        return movie.imdbID == id;
+      })
 
+      _movie = JSON.stringify(_movie)
+
+      if(_movie) { 
+        _movie = JSON.parse(_movie)
+        console.log("Here is movie")
+        console.log(_movie[0])
+
+
+
+      }
+
+      //later uncomment it because of usage compsoable
+      // this.store.rating.forEach((_rating, index) => {
+      //   if(this.store.rating[index].imdbID.id == id) {
+      //     // this.store.rating[index].imdbID.rating = this.movie_rating
+      //     this.store.rating[index].imdbID.rating = _movie[0].movie_rating
+      //     this.store.rating[index].imdbID.review = _movie[0].write_review
+      //     this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
+      //     // this.movie_rating = this.store.rating[index].imdbID.rating 
+      //   }
+      // })
+
+      this.store.rating.forEach((_rating, index) => {
+        if(this.store.rating[index].imdbID.id == id) {
+          // this.store.rating[index].imdbID.rating = _movie[0].movie_rating
+          // this.store.rating[index].imdbID.review = _movie[0].write_review
+          // this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
+
+          // useUpdateMovieInfo(this.store, _movie, index)
+          _movie[0]['list_name'] = this.list_name
+          _movie[0]['list_id'] = this.list_name+'-'+id
+          let _list_name = this.list_name.replace(/\s/g, '')
+          this.update_movie_information.pushR(this.store, _movie, index, {list_name: this.list_name, list_id:this.list_name+'-'+id, nick_name: _list_name})
+        }
+      })
+    },
+
+    showCustomList(){
+
+      let _movies = JSON.parse(JSON.stringify(this.get_all_movies.get_movies(this.store)))
+      let all_lists = [];
+      _movies.forEach((movie) => {
+        if(!all_lists.includes(movie.list.nick_name)) {
+
+          all_lists.push(movie.list.nick_name)
+        }
+      })
+      let values = Object.values(all_lists)[0]
+
+      let single_list = []
+      single_list[values] = 'testing'
+      console.log("here is thesting")
+      console.log(single_list)
+    },
   }
 }
 </script>
