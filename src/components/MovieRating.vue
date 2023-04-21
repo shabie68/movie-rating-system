@@ -213,8 +213,20 @@ console.log(y)
         </div>
 
         <div>
-          <button @click="showCustomList">Click{{test.update_review}}</button>
+          <button @click="showCustomList">Movie{{test.update_review}}</button>
         </div>
+
+        {{custom_movie_selector}} is seleceted
+        <v-select
+          label="Select"
+          :items="custom_list_names"
+          v-model="custom_movie_selector"
+          @update:modelValue="showMovieList"
+        ></v-select>
+
+        <p v-for="(custom, c) in custom_movie_list[custom_movie_selector]" :key="c">
+          {{custom.list}}
+        </p>
     </div>
 </template>
 
@@ -265,6 +277,7 @@ export default {
 	return {
 		movies: null,
     movie_rating: 3,
+    custom_movie_selector: '',
     t_: '',
     list_name: '',
     search: '',
@@ -274,6 +287,8 @@ export default {
     sorted_movies: [],
     years: [],
     rating: [],
+    custom_list_names: [],
+    custom_movie_list: [],
 
 	}
   },
@@ -576,11 +591,6 @@ export default {
 
       if(_movie) { 
         _movie = JSON.parse(_movie)
-        console.log("Here is movie")
-        console.log(_movie[0])
-
-
-
       }
 
       //later uncomment it because of usage compsoable
@@ -604,7 +614,7 @@ export default {
           _movie[0]['list_name'] = this.list_name
           _movie[0]['list_id'] = this.list_name+'-'+id
           let _list_name = this.list_name.replace(/\s/g, '')
-          this.update_movie_information.pushR(this.store, _movie, index, {list_name: this.list_name, list_id:this.list_name+'-'+id, nick_name: _list_name})
+          this.update_movie_information.pushR(this.store, _movie, index, {list_name: this.list_name, list_id:this.list_name+'-'+id, nick_name: _list_name, movie_title: _movie[0].Title, movie_director: _movie[0].director, movie_img: _movie[0].Poster, relase_year: _movie[0].Year})
         }
       })
     },
@@ -617,15 +627,32 @@ export default {
         if(!all_lists.includes(movie.list.nick_name)) {
 
           all_lists.push(movie.list.nick_name)
+          this.custom_list_names.push(movie.list.nick_name)
         }
       })
-      let values = Object.values(all_lists)[0]
 
-      let single_list = []
-      single_list[values] = 'testing'
-      console.log("here is thesting")
-      console.log(single_list)
+      let sing = [];
+      all_lists.forEach((gen) => {
+        sing[gen] = [];
+        this.custom_movie_list[gen] = [];
+        _movies.forEach((movie, index) =>{
+          if(movie.list.nick_name == gen) {
+
+            sing[gen][index] = movie
+            this.custom_movie_list[gen][index] = movie
+          }
+        })
+      })
     },
+
+    showMovieList() {
+      console.log("Here is movies")
+      console.log(this.custom_movie_list)
+      this.custom_movie_list['hollowen'].forEach((movie) => {
+        console.log(movie.list)
+      })
+      
+    }
   }
 }
 </script>
