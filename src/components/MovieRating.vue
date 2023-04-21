@@ -272,8 +272,6 @@ console.log(y)
               </v-row>
             </v-container>
           </div>
-
-
     </div>
 </template>
 
@@ -284,8 +282,10 @@ import { useLocalStorage } from '@vueuse/core'
 import { useMovieRating } from '../movie_rating.js'
 import {useUpdateMovieInfo} from '../update_movie_info.js'
 import {useGetMovies} from '../get_movies.js'
+import {useGetRatedMovies} from '../get_rated_movies.js'
 import {useTest} from '../test.js'
 import {ref} from 'vue'
+
 
 export default {
   setup(){
@@ -309,8 +309,9 @@ export default {
     let update_movie_information = useUpdateMovieInfo(store, test_movie, index)
 
     let get_all_movies = useGetMovies(store)
+    let get_rated_movies = useGetRatedMovies(store)
 
-    return {store, test, movie_information, update_movie_information, get_all_movies}
+    return {store, test, movie_information, update_movie_information, get_all_movies, get_rated_movies}
   },
   name: 'HelloWorld',
   props: {
@@ -318,6 +319,9 @@ export default {
 
   created() {
     this.showCustomList()
+    console.log("HERe is rated movies*****")
+
+    console.log(this.get_rated_movies)
   },
 
   data() {

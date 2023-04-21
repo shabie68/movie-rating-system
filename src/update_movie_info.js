@@ -14,6 +14,7 @@ export function useUpdateMovieInfo(store, movie, index, list='') {
 		store.rating[index].imdbID.rating = movie[0].movie_rating
 		store.rating[index].imdbID.review = movie[0].write_review
 		store.rating[index].imdbID.movie_id = movie[0].imdbID
+		store.rating[index].imdbID.year = movie[0].Year
 		if(list) {
 			store.rating[index].imdbID.list = list;
 		}
