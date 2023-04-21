@@ -224,9 +224,56 @@ console.log(y)
           @update:modelValue="showMovieList"
         ></v-select>
 
-        <p v-for="(custom, c) in custom_movie_list[custom_movie_selector]" :key="c">
-          {{custom.list}}
-        </p>
+       <!--  <p v-for="(custom, c) in custom_movie_list[custom_movie_selector]" :key="c">
+          {{custom.list.movie_title}}
+        </p> -->
+
+
+        <div class="mignon-movies">
+            <v-container class="bg-surface-variant">
+              <v-row no-gutters>
+                <v-col
+                  v-for="(custom_movie, c) in custom_movie_list[custom_movie_selector]" :key="c"
+                  cols="12"
+                  sm="4"
+                >
+                  <v-sheet class="ma-2 pa-2">
+                    
+
+                       <v-card
+                        class="mx-auto"
+                        color="purple"
+                        elevation="10"
+                        width="360"
+                      >
+                        <div class="d-flex justify-between">
+                          
+                          <v-card-title class="flex-grow-1 flex-column align-start">
+                            <div class="text-h5">
+                              {{custom_movie.list.movie_title}}
+                            </div>
+                            <div class="text-h6 font-weight-thin">{{custom_movie.list.movie_director}}</div>
+
+                            <div class="text-h6 font-weight-thin">{{custom_movie.Year}}</div>
+                          </v-card-title>
+
+                          <v-img
+                            contain
+                            height="125px"
+                            :src="custom_movie.list.img"
+                            style="flex-basis: 125px"
+                            class="flex-grow-0"
+                          ></v-img>
+                        </div>
+
+                     </v-card>
+                  </v-sheet>
+                </v-col>
+              </v-row>
+            </v-container>
+          </div>
+
+
     </div>
 </template>
 
@@ -614,7 +661,7 @@ export default {
           _movie[0]['list_name'] = this.list_name
           _movie[0]['list_id'] = this.list_name+'-'+id
           let _list_name = this.list_name.replace(/\s/g, '')
-          this.update_movie_information.pushR(this.store, _movie, index, {list_name: this.list_name, list_id:this.list_name+'-'+id, nick_name: _list_name, movie_title: _movie[0].Title, movie_director: _movie[0].director, movie_img: _movie[0].Poster, relase_year: _movie[0].Year})
+          this.update_movie_information.pushR(this.store, _movie, index, {list_name: this.list_name, list_id:this.list_name+'-'+id, nick_name: _list_name, movie_title: _movie[0].Title, movie_director: _movie[0].director, movie_img: _movie[0].Poster, relase_year: _movie[0].Year, img: _movie[0].Poster})
         }
       })
     },
@@ -635,14 +682,24 @@ export default {
       all_lists.forEach((gen) => {
         sing[gen] = [];
         this.custom_movie_list[gen] = [];
-        _movies.forEach((movie, index) =>{
-          if(movie.list.nick_name == gen) {
+        // _movies.forEach((movie, index) =>{
+        //   if(movie.list.nick_name == gen) {
 
-            sing[gen][index] = movie
-            this.custom_movie_list[gen][index] = movie
-          }
+        //     sing[gen][index] = movie
+        //     this.custom_movie_list[gen][index] = movie
+        //   }
+        // })
+
+        let genre_movie = _movies.filter((movie) => {
+          return movie.list.nick_name == gen
         })
+        // sing[gen][index] = genre_movie
+        this.custom_movie_list[gen] = genre_movie
       })
+
+
+      console.log("Here is custom mvoeis")
+      console.log(this.custom_movie_list)
     },
 
     showMovieList() {
