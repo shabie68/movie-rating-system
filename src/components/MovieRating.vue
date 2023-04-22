@@ -389,15 +389,18 @@ export default {
     // let search_by_year = Number(this.search)
     // let url = search_by_year ? `http://www.omdbapi.com/?i=tt3896198&apikey=8e76539a&s=${_this.search}&y=${search_by_year}` : `http://www.omdbapi.com/?i=tt3896198&apikey=8e76539a&s=${_this.search}`
     let _search = _this.search.split(',')
+    console.log("Here is search")
+    console.log(_search.length)
 
-    axios.get(`http://www.omdbapi.com/?apikey=8e76539a&s=${_search[0]}&y=${_search[1]}`)
+
+    // axios.get(`http://www.omdbapi.com/?apikey=8e76539a&s=${_search[0]}&y=${_search[1]}`)
+    axios.get(`http://www.omdbapi.com/?apikey=8e76539a${_search.length>1 ? '&s='+_search[0]+'&y='+_search[1] : '&s='+_search[0]}`)
     .then(function(response) {
       if(response.data.Response == "True") {
 
         _this.displayMovieList(response.data.Search);
       }
     })  
-
     },
 
     displayMovieList(movies) {
@@ -655,7 +658,8 @@ export default {
           // this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
 
           // useUpdateMovieInfo(this.store, _movie, index)
-
+          console.log("Here is movies*******")
+          console.log(_movie)
           this.update_movie_information.pushR(this.store, _movie, index)
         }
       })

@@ -9,6 +9,7 @@ export function useUpdateMovieInfo(store, movie, index, list='') {
 	console.log(index)
 	console.log("Here is list")
 	console.log(list)
+	console.log("Here is ratings**********")
 	function pushR(store, movie, index, list='') {
 		//store
 		store.rating[index].imdbID.rating = movie[0].movie_rating
