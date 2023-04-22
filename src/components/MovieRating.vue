@@ -238,8 +238,6 @@ console.log(y)
                   sm="4"
                 >
                   <v-sheet class="ma-2 pa-2">
-                    
-
                        <v-card
                         class="mx-auto"
                         color="purple"
@@ -272,14 +270,39 @@ console.log(y)
               </v-row>
             </v-container>
           </div>
+          <v-row>
+            
+            <v-col v-for="(suggested, s) in suggested_movies" :key="s">
+                <v-card
+                  class="mx-auto"
+                  color="purple"
+                  elevation="10"
+                  width="360"
+                >
+                  <div class="d-flex justify-between">
+                    
+                    <v-card-title class="flex-grow-1 flex-column align-start">
+                      <div class="text-h5">
+                        {{suggested.Title}}
+                      </div>
 
+                      <div class="text-h6 font-weight-thin">{{suggested.Director}}</div>
 
-          <div class="mignon-movies" v-for="(suggested, s) in suggested_movies" :key="s">
-            <v-container class="bg-surface-variant">
-              {{suggested.Title}}
-             
-            </v-container>
-          </div>
+                      <div class="text-h6 font-weight-thin">{{suggested.Year}}</div>
+                    </v-card-title>
+
+                    <v-img
+                      contain
+                      height="125px"
+                      :src="suggested.Poster"
+                      style="flex-basis: 125px"
+                      class="flex-grow-0"
+                    ></v-img>
+                  </div>
+               </v-card>  
+            
+            </v-col>
+          </v-row>
     </div>
 </template>
 
@@ -705,10 +728,6 @@ export default {
         // sing[gen][index] = genre_movie
         this.custom_movie_list[gen] = genre_movie
       })
-
-
-      console.log("Here is custom mvoeis")
-      console.log(this.custom_movie_list)
     },
 
     showMovieList() {
@@ -730,41 +749,40 @@ export default {
         if(rating.imdbID.rating >= 1 && rating.imdbID.rating < 2) {
           search = 'adventure'
         }
-        else if(rating.imdbID.rating == 2 && rating.imdbID.rating < 3) {
+        else if(rating.imdbID.rating >= 2 && rating.imdbID.rating < 3) {
           search = 'bold'
         }
-        else if(rating.imdbID.rating == 3 && rating.imdbID.rating < 4) {
+        else if(rating.imdbID.rating >= 3 && rating.imdbID.rating < 4) {
           search = 'comedy'
         }
-        else if(rating.imdbID.rating == 4 && rating.imdbID.rating < 5) {
+        else if(rating.imdbID.rating >= 4 && rating.imdbID.rating < 5) {
           search = 'drama'
         }
         else {
           search = 'elephant'
         }
 
+        let idx = 0;
         axios.get(`http://www.omdbapi.com/?&apikey=8e76539a&s=${search}&y=${rating.imdbID.year}`)
         .then(function(response) {
-          console.log("Here is year movies")
-          console.log(response.data)
           if(response.data.Response == "True") {
 
+            let index = parseInt(rating.imdbID.rating)
             if(!_this.suggested_movies.includes(response.data.Search)) {
-              if(response.data.Search[rating.imdbID.rating]) {
-                console.log("HCEKING***")
-                console.log(response.data.Search[rating.imdbID.rating])
-                _this.suggested_movies.push(response.data.Search[rating.imdbID.rating]) 
-                //  console.log("Here is suggested movies")
-                // console.log(_this.suggested_movies)  
-              }
-               
+
+              if(response.data.Search) {
+                idx+=1
+                
+                if(idx<=index && response.data.Search[idx]) {
+                  
+                  _this.suggested_movies.push(response.data.Search[idx])   
+                }
+                
+              }  
             }
-          
           }
         })  
-      })
-
-     
+      })     
     }
   }
 }
