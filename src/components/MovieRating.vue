@@ -272,6 +272,14 @@ console.log(y)
               </v-row>
             </v-container>
           </div>
+
+
+          <div class="mignon-movies" v-for="(suggested, s) in suggested_movies" :key="s">
+            <v-container class="bg-surface-variant">
+              {{suggested.Title}}
+             
+            </v-container>
+          </div>
     </div>
 </template>
 
@@ -319,9 +327,7 @@ export default {
 
   created() {
     this.showCustomList()
-    console.log("HERe is rated movies*****")
-
-    console.log(this.get_rated_movies)
+    this.showSuggestedMovies()
   },
 
   data() {
@@ -340,6 +346,7 @@ export default {
     rating: [],
     custom_list_names: [],
     custom_movie_list: [],
+    suggested_movies: [],
 
 	}
   },
@@ -365,8 +372,6 @@ export default {
       if(response.data.Response == "True") {
 
         _this.displayMovieList(response.data.Search);
-
-
       }
     })  
 
@@ -713,6 +718,53 @@ export default {
         console.log(movie.list)
       })
       
+    },
+
+    //show suggested movies for 
+    showSuggestedMovies() {
+      let _this = this
+      console.log("Hre is rated")
+      console.log(_this.get_rated_movies.get_rated_m)
+      _this.get_rated_movies.get_rated_m.forEach((rating) => {
+        let search = ''
+        if(rating.imdbID.rating >= 1 && rating.imdbID.rating < 2) {
+          search = 'adventure'
+        }
+        else if(rating.imdbID.rating == 2 && rating.imdbID.rating < 3) {
+          search = 'bold'
+        }
+        else if(rating.imdbID.rating == 3 && rating.imdbID.rating < 4) {
+          search = 'comedy'
+        }
+        else if(rating.imdbID.rating == 4 && rating.imdbID.rating < 5) {
+          search = 'drama'
+        }
+        else {
+          search = 'elephant'
+        }
+
+        axios.get(`http://www.omdbapi.com/?&apikey=8e76539a&s=${search}&y=${rating.imdbID.year}`)
+        .then(function(response) {
+          console.log("Here is year movies")
+          console.log(response.data)
+          if(response.data.Response == "True") {
+
+            if(!_this.suggested_movies.includes(response.data.Search)) {
+              if(response.data.Search[rating.imdbID.rating]) {
+                console.log("HCEKING***")
+                console.log(response.data.Search[rating.imdbID.rating])
+                _this.suggested_movies.push(response.data.Search[rating.imdbID.rating]) 
+                //  console.log("Here is suggested movies")
+                // console.log(_this.suggested_movies)  
+              }
+               
+            }
+          
+          }
+        })  
+      })
+
+     
     }
   }
 }

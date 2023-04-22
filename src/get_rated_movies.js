@@ -10,7 +10,9 @@ export function useGetRatedMovies(store) {
 	// }
 
 	let get_rated_m = ref(0)
-	get_rated_m = store.value.rating
+	get_rated_m = store.value.rating.filter((_rating) => {
+		return _rating.imdbID.rating > 0;
+	})
 
 	return {get_rated_m}
 }
