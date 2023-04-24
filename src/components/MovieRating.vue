@@ -224,11 +224,6 @@ console.log(y)
           @update:modelValue="showMovieList"
         ></v-select>
 
-       <!--  <p v-for="(custom, c) in custom_movie_list[custom_movie_selector]" :key="c">
-          {{custom.list.movie_title}}
-        </p> -->
-
-
         <div class="mignon-movies">
             <v-container class="bg-surface-variant">
               <v-row no-gutters>
@@ -269,40 +264,40 @@ console.log(y)
                 </v-col>
               </v-row>
             </v-container>
-          </div>
-          <v-row>
-            
-            <v-col v-for="(suggested, s) in suggested_movies" :key="s">
-                <v-card
-                  class="mx-auto"
-                  color="purple"
-                  elevation="10"
-                  width="360"
-                >
-                  <div class="d-flex justify-between">
-                    
-                    <v-card-title class="flex-grow-1 flex-column align-start">
-                      <div class="text-h5">
-                        {{suggested.Title}}
-                      </div>
+        </div>
+        <v-row>
+          
+          <v-col v-for="(suggested, s) in suggested_movies" :key="s">
+              <v-card
+                class="mx-auto"
+                color="purple"
+                elevation="10"
+                width="360"
+              >
+                <div class="d-flex justify-between">
+                  
+                  <v-card-title class="flex-grow-1 flex-column align-start">
+                    <div class="text-h5">
+                      {{suggested.Title}}
+                    </div>
 
-                      <div class="text-h6 font-weight-thin">{{suggested.Director}}</div>
+                    <div class="text-h6 font-weight-thin">{{suggested.Director}}</div>
 
-                      <div class="text-h6 font-weight-thin">{{suggested.Year}}</div>
-                    </v-card-title>
+                    <div class="text-h6 font-weight-thin">{{suggested.Year}}</div>
+                  </v-card-title>
 
-                    <v-img
-                      contain
-                      height="125px"
-                      :src="suggested.Poster"
-                      style="flex-basis: 125px"
-                      class="flex-grow-0"
-                    ></v-img>
-                  </div>
-               </v-card>  
-            
-            </v-col>
-          </v-row>
+                  <v-img
+                    contain
+                    height="125px"
+                    :src="suggested.Poster"
+                    style="flex-basis: 125px"
+                    class="flex-grow-0"
+                  ></v-img>
+                </div>
+             </v-card>  
+          
+          </v-col>
+        </v-row>
     </div>
 </template>
 
@@ -737,7 +732,7 @@ export default {
     showMovieList() {
       console.log("Here is movies")
       console.log(this.custom_movie_list)
-      this.custom_movie_list['hollowen'].forEach((movie) => {
+      this.custom_movie_list[this.custom_movie_selector].forEach((movie) => {
         console.log(movie.list)
       })
       

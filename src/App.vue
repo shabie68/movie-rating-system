@@ -1,24 +1,16 @@
 <template>
 
-  <!-- <HelloWorld/> -->
-  <!-- <ComposableComp /> -->
-  <!-- <MovieRating /> -->
-  <ResponsiveMovie />
+  <Movies />
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
-// import MovieRating from './components/MovieRating.vue'
-// import ComposableComp from './components/ComposableComp.vue'
-import ResponsiveMovie from './components/ResponsiveSite'
+import Movies from './components/Movies'
 
 export default {
   name: 'App',
   components: {
-    // HelloWorld,
-    // MovieRating
-    // ComposableComp
-    ResponsiveMovie
+
+    Movies
   }
 }
 </script>

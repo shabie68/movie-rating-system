@@ -20,7 +20,7 @@
                 type="search"
                 v-model="search"
                 label="Search movies"
-                @change="loadMovies()"
+                @change="searchMovies()"
 
               >
                 
@@ -50,9 +50,106 @@
         <v-container>
           <div class="mignon-movies">
 
-            <h2>
-              All Movies
-            </h2>
+            <h1>
+              <span class="text-primary">Some guidelines when searching movies. You have 3 options available
+              </span>
+            </h1>
+            <p>
+              
+              <br>
+              <ul>
+                <li>
+                  <span class="text-success">By title**</span> 
+                  <p class="text-info">
+                    Just type title of the movie or type first 2 or 3 words of the title<br>
+                    i.e Search term** "Bold" will show the movies that have bold in their title<br>
+                    You can also type "Bo" to search movies begin with "Bo"
+                  </p>
+                </li>
+
+                <li>
+                  <span class="text-success">
+                    By year**
+                  </span>
+                   <p class="text-info">
+                     You can also search just type the year of release. i.e 2021 will load movies that release in 2021
+                   </p>
+                </li>
+
+                <li>
+                  <span class="text-success">
+                     By title and year***** 
+                  </span>
+                  <p class="text-info">
+                    Want to search the movies where title = "some title" and year = "some year". Will load the movies for some title that are released in some year. Just enter values as follow<br>
+                    1st value = title separated by comma with no spaces and then type year<br>
+                    i.e <b>Bold,2020</b> will load movies having title Bold and that are released in 2020
+                  </p>
+                 
+                </li>
+              </ul>
+            </p>
+
+            <v-divider></v-divider>
+            <div id="custom-movie-list">
+              <h1 class="text-primary">Guidelines for Creating Custom Movie Lists</h1>
+              <p>
+                <ul>
+                  <li>
+                    <span class="text-success">1- Name**</span>
+                    <p>
+                      Just type the name of list you want to create in the field <b>Create Custom Movie List</b>
+                    </p>
+
+                  </li>
+
+                  <li>
+                    <span class="text-success"> 2- Select the movies</span>
+                    <p>Select the checkbox around each movie. You can select multiple checkboxes</p>
+                  </li>
+                </ul>
+              </p>  
+            </div>
+            
+
+            <v-row id="movie-body">
+              <v-col
+                col="4"
+              >
+                <h2>
+                  All Movies
+                </h2>
+              </v-col>
+
+              <v-col
+                col="4"
+              >
+                <v-select
+                  max-width="344"
+                  label="Filter Movies"
+                  :items="filter_items"
+                  v-model="sort_movies"
+                  @update:modelValue="sortMovies()"
+                ></v-select>
+              </v-col>
+
+              <v-col>
+                <v-responsive
+                  class="mx-auto"
+                >
+                  <v-text-field
+                    type="text"
+                    v-model="list_name"
+                    label="Enter Custom List Name"
+
+                  >
+                    
+                  </v-text-field>
+                </v-responsive> 
+              </v-col>
+            </v-row>
+              
+            
             <v-container class="bg-surface-variant">
               <v-row no-gutters>
                 <v-col
@@ -96,50 +193,65 @@
 
                         <v-card-actions class="pa-4">
                           <div>
-                            <p>
-                              <v-checkbox
-                                v-model="movie.list_movie"
-                                label="Select"
-                                @click="createCustomList(movie.imdbID)"
-                                id="movie.imdbID"
-                              ></v-checkbox>
-                            </p>
+                            <div>
+                              <p>
+                                <v-checkbox
+                                  v-model="movie.list_movie"
+                                  label="Include in custom list"
+                                  @click="createCustomList(movie.imdbID)"
+                                  id="movie.imdbID"
+                                ></v-checkbox>
+                              </p>
+                            </div>
+
+                            <div>
+                              <span>
+                                Rate this album  
+                              </span>
+                              
+
+                              <v-spacer></v-spacer>
+
+                              <span class="text-grey-lighten-2 text-caption me-2">
+                                
+                              </span>
+
+                              <v-rating
+                                v-model="movie.movie_rating"
+                                color="white"
+                                active-color="yellow-accent-4"
+                                half-increments
+                                hover
+                                size="18"
+                                @change="updateRating(movie.imdbID)"
+                                ></v-rating>  
+                            </div>
+
+
                           </div>
-                          <span>
-                            Rate this album  
-                          </span>
-                          
 
-                          <v-spacer></v-spacer>
+                          <v-divider></v-divider>
+                            <div>
+                              <v-responsive
+                                class="mx-auto"
+                                max-width="344"
+                              >
+                                <v-text-field
+                                  label="write_review"
+                                  hide-details="auto"
+                                  v-model="movie.write_review"
+                                ></v-text-field>
+                                
 
-                          <span class="text-grey-lighten-2 text-caption me-2">
-                            
-                          </span>
+                              </v-responsive>
 
-                          <v-rating
-                            v-model="movie.movie_rating"
-                            color="white"
-                            active-color="yellow-accent-4"
-                            half-increments
-                            hover
-                            size="18"
-                            @change="updateRating(movie.imdbID)"
-                            ></v-rating>
-
-                            <v-responsive
-                            class="mx-auto"
-                            max-width="344"
-                          >
-                            <v-text-field
-                              label="write_review"
-                              hide-details="auto"
-                              v-model="movie.write_review"
-                            ></v-text-field>
-                            <button @click="updateRating(movie.imdbID, 'review')">
-                              Write Review
-                            </button>
-
-                          </v-responsive>
+                              <v-btn 
+                                color="info"
+                                @click="updateRating(movie.imdbID, 'review')"
+                              >
+                                  Write Review
+                              </v-btn>
+                          </div>
                         </v-card-actions>
                       </v-card>
                   </v-sheet>
@@ -147,7 +259,110 @@
               </v-row>
             </v-container>
           </div>
+
+          <v-divider></v-divider>
+          <div>
+            <h1>
+              Custom List Movies
+            </h1>
+            <span class="text-primary">
+              Please select the name of your movie list name below
+            </span>
+
+            <v-select
+              label="Select"
+              :items="custom_list_names"
+              v-model="custom_movie_selector"
+              @update:modelValue="showMovieList"
+            ></v-select>
+
+            <div class="mignon-movies">
+                <v-container class="bg-surface-variant">
+                  <v-row no-gutters>
+                    <v-col
+                      v-for="(custom_movie, c) in custom_movie_list[custom_movie_selector]" :key="c"
+                      cols="12"
+                      sm="4"
+                    >
+                      <v-sheet class="ma-2 pa-2">
+                           <v-card
+                            class="mx-auto"
+                            color="purple"
+                            elevation="10"
+                            width="360"
+                          >
+                            <div class="d-flex justify-between">
+                              
+                              <v-card-title class="flex-grow-1 flex-column align-start">
+                                <div class="text-h5">
+                                  {{custom_movie.list.movie_title}}
+                                </div>
+                                <div class="text-h6 font-weight-thin">{{custom_movie.list.movie_director}}</div>
+
+                                <div class="text-h6 font-weight-thin">{{custom_movie.Year}}</div>
+                              </v-card-title>
+
+                              <v-img
+                                contain
+                                height="125px"
+                                :src="custom_movie.list.img"
+                                style="flex-basis: 125px"
+                                class="flex-grow-0"
+                              ></v-img>
+                            </div>
+
+                         </v-card>
+                      </v-sheet>
+                    </v-col>
+                  </v-row>
+
+                </v-container>
+              </div>  
+            </div>
+            
+          </v-container>
+        <v-container>
+          
+          <div v-if="suggested_movies.length > 0">
+            <h1>
+            Suggested Movies For You!
+          </h1>
+          <v-row>
+          
+            <v-col v-for="(suggested, s) in suggested_movies" :key="s">
+                <v-card
+                  class="mx-auto"
+                  color="purple"
+                  elevation="10"
+                  width="360"
+                >
+                  <div class="d-flex justify-between">
+                    <v-card-title class="flex-grow-1 flex-column align-start">
+                      <div class="text-h5">
+                        {{suggested.Title}}
+                      </div>
+
+                      <div class="text-h6 font-weight-thin">{{suggested.Director}}</div>
+
+                      <div class="text-h6 font-weight-thin">{{suggested.Year}}</div>
+                    </v-card-title>
+
+                    <v-img
+                      contain
+                      height="125px"
+                      :src="suggested.Poster"
+                      style="flex-basis: 125px"
+                      class="flex-grow-0"
+                    ></v-img>
+                  </div>
+               </v-card>  
+            
+            </v-col>
+          </v-row>  
+          </div>
+            
         </v-container>
+        
     </div>
 </template>
 
@@ -197,7 +412,9 @@ export default {
 
     this.showCustomList()
     this.showSuggestedMovies()
+    this.loadMovies()
   },
+
 
   data() {
 	return {
@@ -216,6 +433,7 @@ export default {
     custom_list_names: [],
     custom_movie_list: [],
     suggested_movies: [],
+    filter_items: ['rating', 'year', 'title'],
 
 	}
   },
@@ -229,17 +447,27 @@ export default {
     console.log(this.test)
     console.log(this.test)
   },
+
+  //when the user visit the page these movies will be shown
   loadMovies() {
+    var _this = this
+
+    axios.get('http://www.omdbapi.com/?apikey=8e76539a&s=movie')
+    .then(function(response) {
+      if(response.data.Response == "True") {
+        console.log("Here are default movies*****")
+        console.log(response.data.Search)
+        _this.displayMovieList(response.data.Search);
+      }
+    }) 
+  },
+
+
+  searchMovies() {
 
     var _this = this
-    // let search_by_year = Number(this.search)
-    // let url = search_by_year ? `http://www.omdbapi.com/?i=tt3896198&apikey=8e76539a&s=${_this.search}&y=${search_by_year}` : `http://www.omdbapi.com/?i=tt3896198&apikey=8e76539a&s=${_this.search}`
     let _search = _this.search.split(',')
-    console.log("Here is search")
-    console.log(_search.length)
 
-
-    // axios.get(`http://www.omdbapi.com/?apikey=8e76539a&s=${_search[0]}&y=${_search[1]}`)
     axios.get(`http://www.omdbapi.com/?apikey=8e76539a${_search.length>1 ? '&s='+_search[0]+'&y='+_search[1] : '&s='+_search[0]}`)
     .then(function(response) {
       if(response.data.Response == "True") {
@@ -273,8 +501,6 @@ export default {
     single_movie(movie, index) {
 
       let _this = this
-      // let _rating = 0;
-
 
       axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=8e76539a`)
       .then((response) => {
@@ -294,21 +520,9 @@ export default {
 
         load_rating_movie = JSON.parse(JSON.stringify(load_rating_movie))
 
-        // console.log(load_rating_movie)
         if(load_rating_movie.length > 0 ) {
           this.store.rating.forEach((_rating, _index) => {
-          
-            // if(this.store.rating[_index].imdbID.id == _this.movies[index].imdbID) {
               if(this.store.rating[_index].imdbID.id == load_rating_movie[0].imdbID.movie_id) {
-                console.log("Inside***")
-                console.log(load_rating_movie[0].imdbID.rating)
-
-              // _this.movies[index]['movie_rating'] = this.store.rating[index].imdbID.rating ?this.store.rating[index].imdbID.rating : 0;
-
-              // _this.movies[index]['write_review'] = this.store.rating[index].imdbID.review ? this.store.rating[index].imdbID.review: ''
-
-
-
               _this.movies[index]['movie_rating'] = load_rating_movie[0].imdbID.rating ?load_rating_movie[0].imdbID.rating : 0
 
 
@@ -320,56 +534,11 @@ export default {
             }
           })
         }
-      //   this.store.rating.forEach((_rating, _index) => {
-          
-      //   if(this.store.rating[_index].imdbID.id == _this.movies[index].imdbID) {
-
-      //     _this.movies[index]['movie_rating'] = this.store.rating[index].imdbID.rating ?this.store.rating[index].imdbID.rating : 0;
-
-      //     _this.movies[index]['write_review'] = this.store.rating[index].imdbID.review ? this.store.rating[index].imdbID.review: ''
-      //   }
-      // })
-
-
-        // _this.store.rating.push({title: _this.movies[index]['imdbID'], value: 0})
-        // const found = _this.store.rating.find(element => element['imdbID'].id == _this.movies[index]['imdbID']);
-
-        //later uncomment this because we are using compsoable
-        // if(!found) {
-        //   _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0, review: _this.movies[index]['write_review']}}) 
-           
-        // }
-
-        // useMovieRating(_this.store, _this.movies[index])
 
         const found = _this.store.rating.find(element => element['imdbID'].id == _this.movies[index]['imdbID']);
         if(!found) {
           this.movie_information.pushR(_this.store, _this.movies[index])  
         }
-        
-        
-
-        
-        // _this.store.rating['imdbID'] = {id: _this.movies[index]['imdbID'], rating: 0}
-
-        // _this.store.rating['imdbID']['rating'] = 0
-
-        // if(response.data.Ratings) {
-        //   response.data.Ratings.forEach((rating) => {
-
-        //     let __rating = Number(rating.Value.split("/")[0].replace('%', ''))
-        //     if(__rating > 10) {
-        //       _rating+=Number(__rating)/10
-        //     }else {
-        //       _rating+=Number(rating.Value.split("/")[0])
-        //     }
-
-        //     _this.movies[index]['ratings'] = (_rating/(response.data.Ratings.length)).toFixed(2)
-
-        //     _this.rating.push((_rating/(response.data.Ratings.length)).toFixed(2))  
-
-        //   })  
-        // }
        
         this.setRatings(response.data.Ratings, index)
       })
@@ -411,8 +580,6 @@ export default {
       if(ratings.length > 0) {
           let __ratings__ = ratings.map((rating) => {
 
-            
-
             let __rating = Number(rating.Value.split("/")[0].replace('%', ''))
             if(__rating > 10) {
               _rating+=Number(__rating)/10
@@ -420,37 +587,9 @@ export default {
               _rating+=Number(rating.Value.split("/")[0])
             }
             return _rating
-            // if(!values) {
-            //   this.movies[index]['ratings'] = (_rating/(ratings.length)).toFixed(2)
-            // }
-            // else {
-            //   values[0].ratings = (_rating/(ratings.length)).toFixed(2)
-            // }
-
-            // _rating+=(_movie_rating.movie_rating*2)
-
-            // let avg_rating = _movie_rating.movie_rating  > 0 ? (_rating/(ratings.length+1)) : (_rating/(ratings.length)) 
-
-            // console.log("here is rating")
-            // console.log(_rating)
-            // // _rating+=_movie_rating.movie_rating > 0 ? _movie_rating.movie_rating : 0;
-            // let avg_rating = _movie_rating.movie_rating  > 0 ? (_rating/(ratings.length+1)) : (_rating/(ratings.length)) 
-            
-
-            // // _movie_rating['ratings'] = (_rating/(ratings.length)).toFixed(2)
-            // console.log("here is avg ratings****")
-            // console.log(avg_rating)
-            // //convert avg ratings to be on scale of 5
-            // _movie_rating['ratings'] = (avg_rating).toFixed(2)
-            // this.rating.push(_movie_rating)
-
-            // this.rating.push((_rating/(ratings.length)).toFixed(2))  
-            
-
           })
 
           let total_ratings = __ratings__.length
-          //add user rating to it
 
           __ratings__ = __ratings__[total_ratings-1]
 
@@ -462,7 +601,6 @@ export default {
           let avg_rating = (__ratings__)/total_ratings.toFixed(2)
 
           _movie_rating['ratings'] = avg_rating/2
-          // this.rating.push(_movie_rating)
           
       }else {
         _movie_rating['ratings'] = _movie_rating.movie_rating
@@ -486,26 +624,8 @@ export default {
         }
       }
 
-      //later uncomment it because of usage compsoable
-      // this.store.rating.forEach((_rating, index) => {
-      //   if(this.store.rating[index].imdbID.id == id) {
-      //     // this.store.rating[index].imdbID.rating = this.movie_rating
-      //     this.store.rating[index].imdbID.rating = _movie[0].movie_rating
-      //     this.store.rating[index].imdbID.review = _movie[0].write_review
-      //     this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
-      //     // this.movie_rating = this.store.rating[index].imdbID.rating 
-      //   }
-      // })
-
       this.store.rating.forEach((_rating, index) => {
         if(this.store.rating[index].imdbID.id == id) {
-          // this.store.rating[index].imdbID.rating = _movie[0].movie_rating
-          // this.store.rating[index].imdbID.review = _movie[0].write_review
-          // this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
-
-          // useUpdateMovieInfo(this.store, _movie, index)
-          console.log("Here is movies*******")
-          console.log(_movie)
           this.update_movie_information.pushR(this.store, _movie, index)
         }
       })
@@ -522,24 +642,9 @@ export default {
         _movie = JSON.parse(_movie)
       }
 
-      //later uncomment it because of usage compsoable
-      // this.store.rating.forEach((_rating, index) => {
-      //   if(this.store.rating[index].imdbID.id == id) {
-      //     // this.store.rating[index].imdbID.rating = this.movie_rating
-      //     this.store.rating[index].imdbID.rating = _movie[0].movie_rating
-      //     this.store.rating[index].imdbID.review = _movie[0].write_review
-      //     this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
-      //     // this.movie_rating = this.store.rating[index].imdbID.rating 
-      //   }
-      // })
-
       this.store.rating.forEach((_rating, index) => {
         if(this.store.rating[index].imdbID.id == id) {
-          // this.store.rating[index].imdbID.rating = _movie[0].movie_rating
-          // this.store.rating[index].imdbID.review = _movie[0].write_review
-          // this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
 
-          // useUpdateMovieInfo(this.store, _movie, index)
           _movie[0]['list_name'] = this.list_name
           _movie[0]['list_id'] = this.list_name+'-'+id
           let _list_name = this.list_name.replace(/\s/g, '')
@@ -564,36 +669,30 @@ export default {
       all_lists.forEach((gen) => {
         sing[gen] = [];
         this.custom_movie_list[gen] = [];
-        // _movies.forEach((movie, index) =>{
-        //   if(movie.list.nick_name == gen) {
-
-        //     sing[gen][index] = movie
-        //     this.custom_movie_list[gen][index] = movie
-        //   }
-        // })
 
         let genre_movie = _movies.filter((movie) => {
           return movie.list.nick_name == gen
         })
-        // sing[gen][index] = genre_movie
+
         this.custom_movie_list[gen] = genre_movie
       })
     },
 
+
+    //custom movies list
     showMovieList() {
       console.log("Here is movies")
       console.log(this.custom_movie_list)
-      this.custom_movie_list['hollowen'].forEach((movie) => {
+      this.custom_movie_list[this.custom_movie_selector].forEach((movie) => {
         console.log(movie.list)
       })
       
     },
 
-    //show suggested movies for 
+    //show suggested movies for user base on rating
     showSuggestedMovies() {
+
       let _this = this
-      console.log("Hre is rated")
-      console.log(_this.get_rated_movies.get_rated_m)
       _this.get_rated_movies.get_rated_m.forEach((rating) => {
         let search = ''
         if(rating.imdbID.rating >= 1 && rating.imdbID.rating < 2) {
@@ -709,6 +808,17 @@ caption {
 
 }
 
+.v-card-actions {
+  display: block;
+}
+
+#movie-body {
+  padding: 16px
+}
+
+#custom-movie-list {
+  padding: 10 0px 10 0px
+}
 
 
 
