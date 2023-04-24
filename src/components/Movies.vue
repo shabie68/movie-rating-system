@@ -127,7 +127,7 @@
                 <v-select
                   max-width="344"
                   label="Filter Movies"
-                  :items="filter_items"
+                  :items="sort_items"
                   v-model="sort_movies"
                   @update:modelValue="sortMovies()"
                 ></v-select>
@@ -433,7 +433,7 @@ export default {
     custom_list_names: [],
     custom_movie_list: [],
     suggested_movies: [],
-    filter_items: ['rating', 'year', 'title'],
+    sort_items: ['rating', 'year', 'title'],
 
 	}
   },
