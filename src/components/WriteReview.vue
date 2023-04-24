@@ -188,7 +188,27 @@
                       </div>
 
                       <v-divider></v-divider>
-                      
+                      <div>
+                        <v-responsive
+                          class="mx-auto"
+                          max-width="344"
+                        >
+                          <v-text-field
+                            label="write_review"
+                            hide-details="auto"
+                            v-model="movie.write_review"
+                          ></v-text-field>
+                          
+
+                        </v-responsive>
+
+                        <v-btn 
+                          color="info"
+                          @click="updateRating(movie.imdbID, 'review')"
+                        >
+                            Write Review
+                        </v-btn>
+                    </div>
                     </v-card-actions>
                   </v-card>
               </v-sheet>
@@ -202,7 +222,7 @@
 
 	import axios from 'axios'
   import { useLocalStorage } from '@vueuse/core'
-	
+
 	export default {
 
       setup(){
@@ -312,6 +332,7 @@
           _this.movies[index]['imdbID'] = response.data.imdbID
           _this.movies[index]['all_ratings'] = response.data.Ratings
           _this.movies[index]['movie_rating'] = null;
+          _this.movies[index]['write_review'] = null;
           _this.movies[index]['list_name'] = null;
           _this.movies[index]['list_movie'] = null;   
 
@@ -326,17 +347,17 @@
             this.store.rating.forEach((_rating, _index) => {
                 if(this.store.rating[_index].imdbID.id == load_rating_movie[0].imdbID.movie_id) {
                 _this.movies[index]['movie_rating'] = load_rating_movie[0].imdbID.rating ?load_rating_movie[0].imdbID.rating : 0
+
+                _this.movies[index]['write_review'] = load_rating_movie[0].imdbID.review ? load_rating_movie[0].imdbID.review: ''
               }
             })
           }
 
-
           const found = _this.store.rating.find(element => element['imdbID'].id == _this.movies[index]['imdbID']);
           if(!found) {
-            _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0}}) 
+            _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0,review: _this.movies[index]['write_review']}}) 
              
           } 
-
           this.setRatings(response.data.Ratings, index)     
         })
       },
@@ -388,9 +409,11 @@
             }  
           }
         }
+
         this.store.rating.forEach((_rating, index) => {
           if(this.store.rating[index].imdbID.id == id) {
             this.store.rating[index].imdbID.rating = _movie[0].movie_rating
+            this.store.rating[index].imdbID.review = _movie[0].write_review
             this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
           }
         })

@@ -3,7 +3,11 @@
   <!-- <AddSearchBar></AddSearchBar> -->
   <!-- <FilterMovies></FilterMovies> -->
   <!-- <SortMovies></SortMovies> -->
-  <RateMovies></RateMovies>
+  <!-- <RateMovies></RateMovies> -->
+  <!-- <WriteReview></WriteReview> -->
+  <CodeReusability></CodeReusability>
+  <!-- <CreateCustomMovieList></CreateCustomMovieList> -->
+  <!-- <SuggestMovies></SuggestMovies> -->
   <!-- <Movies /> -->
 </template>
 
@@ -13,7 +17,12 @@
 // import AddSearchBar from './components/AddSearchBar'
 // import FilterMovies from './components/FilterMovies'
 // import SortMovies from './components/SortMovies'
-import RateMovies from './components/RateMovies'
+// import RateMovies from './components/RateMovies'
+// import WriteReview from './components/WriteReview'
+import CodeReusability from './components/CodeReusability'
+// import CreateCustomMovieList from './components/CreateCustomMovieList'
+// import SuggestMovies from './components/SuggestMovies'
+
 export default {
   name: 'App',
   components: {
@@ -21,7 +30,11 @@ export default {
     // AddSearchBar
     // FilterMovies
     // SortMovies
-    RateMovies
+    // RateMovies
+    // WriteReview
+    CodeReusability
+    // CreateCustomMovieList
+    // SuggestMovies
     // Movies
   }
 }

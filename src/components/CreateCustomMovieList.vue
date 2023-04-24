@@ -117,6 +117,21 @@
                 @update:modelValue="sortMovies()"
               ></v-select>
             </v-col>
+
+            <v-col>
+                <v-responsive
+                  class="mx-auto"
+                >
+                  <v-text-field
+                    type="text"
+                    v-model="list_name"
+                    label="Enter Custom List Name"
+
+                  >
+                    
+                  </v-text-field>
+                </v-responsive> 
+              </v-col>
         </v-row>
 
         <v-container class="bg-surface-variant">
@@ -162,6 +177,16 @@
 
                     <v-card-actions class="pa-4">
                       <div>
+						<div>
+                          <p>
+                            <v-checkbox
+                              v-model="movie.list_movie"
+                              label="Include in custom list"
+                              @click="createCustomList(movie.imdbID)"
+                              id="movie.imdbID"
+                            ></v-checkbox>
+                          </p>
+                        </div>
                         <div>
                           <span>
                             Rate this album  
@@ -188,13 +213,93 @@
                       </div>
 
                       <v-divider></v-divider>
-                      
+                      <div>
+                        <v-responsive
+                          class="mx-auto"
+                          max-width="344"
+                        >
+                          <v-text-field
+                            label="write_review"
+                            hide-details="auto"
+                            v-model="movie.write_review"
+                          ></v-text-field>
+                          
+
+                        </v-responsive>
+
+                        <v-btn 
+                          color="info"
+                          @click="updateRating(movie.imdbID, 'review')"
+                        >
+                            Write Review
+                        </v-btn>
+                    </div>
                     </v-card-actions>
                   </v-card>
               </v-sheet>
             </v-col>
           </v-row>
         </v-container>
+
+        <v-divider></v-divider>
+        <div>
+			<h1>
+              Custom List Movies
+            </h1>
+            <span class="text-primary">
+              Please select the name of your movie list name below
+            </span>
+
+            <v-select
+              label="Select"
+              :items="custom_list_names"
+              v-model="custom_movie_selector"
+              @update:modelValue="showMovieList"
+            ></v-select>
+
+            <div class="mignon-movies">
+                <v-container class="bg-surface-variant">
+                  <v-row no-gutters>
+                    <v-col
+                      v-for="(custom_movie, c) in custom_movie_list[custom_movie_selector]" :key="c"
+                      cols="12"
+                      sm="4"
+                    >
+                      <v-sheet class="ma-2 pa-2">
+                           <v-card
+                            class="mx-auto"
+                            color="purple"
+                            elevation="10"
+                            width="360"
+                          >
+                            <div class="d-flex justify-between">
+                              
+                              <v-card-title class="flex-grow-1 flex-column align-start">
+                                <div class="text-h5">
+                                  {{custom_movie.list.movie_title}}
+                                </div>
+                                <div class="text-h6 font-weight-thin">{{custom_movie.list.movie_director}}</div>
+
+                                <div class="text-h6 font-weight-thin">{{custom_movie.Year}}</div>
+                              </v-card-title>
+
+                              <v-img
+                                contain
+                                height="125px"
+                                :src="custom_movie.list.img"
+                                style="flex-basis: 125px"
+                                class="flex-grow-0"
+                              ></v-img>
+                            </div>
+
+                         </v-card>
+                      </v-sheet>
+                    </v-col>
+                  </v-row>
+
+                </v-container>
+              </div> 
+        </div>
 	</div>
 </template>
 
@@ -202,7 +307,12 @@
 
 	import axios from 'axios'
   import { useLocalStorage } from '@vueuse/core'
-	
+  import { useMovieRating } from '../movie_rating.js'
+  import {useUpdateMovieInfo} from '../update_movie_info.js'
+  import {useGetMovies} from '../get_movies.js'
+
+  import {ref} from 'vue'
+
 	export default {
 
       setup(){
@@ -212,22 +322,33 @@
           {rating: []}
         )
 
-        return {store}
+        let test_movie = ref(null)
+        let movie_information = useMovieRating(store, test_movie)
+        let index = ref(0)
+        let update_movie_information = useUpdateMovieInfo(store, test_movie, index)
+
+        let get_all_movies = useGetMovies(store)
+        return {store, movie_information, update_movie_information, get_all_movies}
       },
 		data() {
 			return {
 				movies: [],
 				search: '',
-        sort_items: ['rating', 'year', 'title'],
-        rating: [],
-        years: [],
-        sort_movies: 'rating',
-        movie_rating: 3
+				sort_items: ['rating', 'year', 'title'],
+				rating: [],
+				years: [],
+				sort_movies: 'rating',
+				custom_movie_selector: '',
+				custom_list_names: [],
+				custom_movie_list: [],
+				movie_rating: 3,
+				list_name: ''
 			}
 		},
 
 		created() {
 			this.loadMovies()
+			this.showCustomList()
 		},
 
 		methods: {
@@ -312,6 +433,7 @@
           _this.movies[index]['imdbID'] = response.data.imdbID
           _this.movies[index]['all_ratings'] = response.data.Ratings
           _this.movies[index]['movie_rating'] = null;
+          _this.movies[index]['write_review'] = null;
           _this.movies[index]['list_name'] = null;
           _this.movies[index]['list_movie'] = null;   
 
@@ -326,17 +448,16 @@
             this.store.rating.forEach((_rating, _index) => {
                 if(this.store.rating[_index].imdbID.id == load_rating_movie[0].imdbID.movie_id) {
                 _this.movies[index]['movie_rating'] = load_rating_movie[0].imdbID.rating ?load_rating_movie[0].imdbID.rating : 0
+
+                _this.movies[index]['write_review'] = load_rating_movie[0].imdbID.review ? load_rating_movie[0].imdbID.review: ''
               }
             })
           }
 
-
           const found = _this.store.rating.find(element => element['imdbID'].id == _this.movies[index]['imdbID']);
           if(!found) {
-            _this.store.rating.push({imdbID: {id: _this.movies[index]['imdbID'], rating: 0}}) 
-             
-          } 
-
+            this.movie_information.pushR(_this.store, _this.movies[index])  
+          }
           this.setRatings(response.data.Ratings, index)     
         })
       },
@@ -388,15 +509,76 @@
             }  
           }
         }
+
         this.store.rating.forEach((_rating, index) => {
           if(this.store.rating[index].imdbID.id == id) {
-            this.store.rating[index].imdbID.rating = _movie[0].movie_rating
-            this.store.rating[index].imdbID.movie_id = _movie[0].imdbID
+            this.update_movie_information.pushR(this.store, _movie, index)
           }
         })
       },
-		}
+
+      createCustomList(id) {
+			let _movie = this.movies.filter((movie) => {
+				return movie.imdbID == id;
+			})
+
+			_movie = JSON.stringify(_movie)
+
+			if(_movie) { 
+				_movie = JSON.parse(_movie)
+			}
+
+
+				this.store.rating.forEach((_rating, index) => {
+					if(this.store.rating[index].imdbID.id == id) {
+
+					_movie[0]['list_name'] = this.list_name
+					_movie[0]['list_id'] = this.list_name+'-'+id
+					let _list_name = this.list_name.replace(/\s/g, '')
+					this.update_movie_information.pushR(this.store, _movie, index, {list_name: this.list_name, list_id:this.list_name+'-'+id, nick_name: _list_name, movie_title: _movie[0].Title, movie_director: _movie[0].director, movie_img: _movie[0].Poster, relase_year: _movie[0].Year, img: _movie[0].Poster})
+					}
+				})	
+		},
+
+		showCustomList(){
+
+			let _movies = JSON.parse(JSON.stringify(this.get_all_movies.get_movies(this.store)))
+			let all_lists = [];
+			_movies.forEach((movie) => {
+				if(!all_lists.includes(movie.list.nick_name)) {
+					all_lists.push(movie.list.nick_name)
+					this.custom_list_names.push(movie.list.nick_name)
+				}
+			})
+
+			let sing = [];
+			all_lists.forEach((gen) => {
+				sing[gen] = [];
+				this.custom_movie_list[gen] = [];
+
+				let genre_movie = _movies.filter((movie) => {
+					return movie.list.nick_name == gen
+				})
+
+				this.custom_movie_list[gen] = genre_movie
+			})
+
+			console.log("Here is all lists")
+			console.log(all_lists)
+		},
+
+
+		//custom movies list
+		showMovieList() {
+		console.log("Here is movies")
+		console.log(this.custom_movie_list)
+		this.custom_movie_list[this.custom_movie_selector].forEach((movie) => {
+		console.log(movie.list)
+		})
+
+		},
 	}
+}
 </script>
 
 
